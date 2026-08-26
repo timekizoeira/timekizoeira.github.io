@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Força o navegador a converter qualquer link ou imagem para HTTPS seguro -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Personalizar Foto - #TIMEKIZOEIRA!</title>
     <style>
         * {
@@ -10,7 +12,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: Arial, sans-serif;
-            touch-action: manipulation;
         }
 
         body {
@@ -100,22 +101,20 @@
 
         .preview-area {
             position: relative;
-            width: 100%;
-            max-width: 300px;
-            height: 300px;
+            width: 280px;
+            height: 280px;
             margin-bottom: 15px;
             border: 2px solid #ffffff;
             border-radius: 8px;
             overflow: hidden;
             background: #000000;
-            touch-action: none; /* Permite arrastar no celular sem rolar a página */
+            touch-action: none;
         }
 
         canvas {
             width: 100%;
             height: 100%;
             display: block;
-            cursor: move;
         }
 
         .instructions {
@@ -159,7 +158,7 @@
             <canvas id="canvas"></canvas>
         </div>
         
-        <p class="instructions">💡 Arraste com o dedo para mover e use dois dedos para dar zoom na foto.</p>
+        <p class="instructions">💡 Arraste com o dedo para posicionar sua foto.</p>
 
         <div class="actions-container">
             <button id="downloadBtn" class="btn" disabled>💾 BAIXAR FOTO PRONTA</button>
@@ -190,29 +189,26 @@
         let userImg = null;
         let frameImg = new Image();
 
-        // Configuração do Canvas Interno
-        canvas.width = 600;
-        canvas.height = 600;
+        canvas.width = 400;
+        canvas.height = 400;
 
-        // Controle de Transformação da Foto
         let imgX = 0;
         let imgY = 0;
         let imgScale = 1;
         let isDragging = false;
         let startX = 0;
         let startY = 0;
-        let initialPinchDistance = null;
+        let renderPending = false;
 
-        // Pré-carrega a primeira moldura
         frameImg.src = moldurasSrc[0];
-        frameImg.onload = () => render();
+        frameImg.onload = () => requestRender();
 
         function selectMoldura(index, element) {
             document.querySelectorAll('.moldura-thumb').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
             selectedMolduraIndex = index;
             frameImg.src = moldurasSrc[index];
-            frameImg.onload = () => render();
+            frameImg.onload = () => requestRender();
         }
 
         function processFile(file) {
@@ -223,13 +219,12 @@
                 img.onload = () => {
                     userImg = img;
                     
-                    // Ajuste inicial proporcional (Cover)
                     const baseScale = Math.max(canvas.width / img.width, canvas.height / img.height);
                     imgScale = baseScale;
                     imgX = (canvas.width - img.width * imgScale) / 2;
                     imgY = (canvas.height - img.height * imgScale) / 2;
 
-                    render();
+                    requestRender();
                     downloadBtn.disabled = false;
                 };
                 img.src = e.target.result;
@@ -240,82 +235,55 @@
         cameraInput.addEventListener('change', (e) => processFile(e.target.files[0]));
         galleryInput.addEventListener('change', (e) => processFile(e.target.files[0]));
 
+        function requestRender() {
+            if (!renderPending) {
+                renderPending = true;
+                requestAnimationFrame(render);
+            }
+        }
+
         function render() {
+            renderPending = false;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Desenha a Foto do Usuário (Se existir)
             if (userImg) {
-                ctx.save();
                 ctx.drawImage(userImg, imgX, imgY, userImg.width * imgScale, userImg.height * imgScale);
-                ctx.restore();
             }
 
-            // 2. Desenha a Moldura por cima
             if (frameImg.complete && frameImg.naturalWidth !== 0) {
                 ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
             }
         }
 
-        // --- CONTROLES DE INTERAÇÃO (TOQUE E MOUSE) ---
-        
-        function getCanvasPoint(e) {
+        function getPos(e) {
             const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
             return {
-                x: (clientX - rect.left) * scaleX,
-                y: (clientY - rect.top) * scaleY
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
             };
         }
 
-        function getPinchDistance(e) {
-            const dx = e.touches[0].clientX - e.touches[1].clientX;
-            const dy = e.touches[0].clientY - e.touches[1].clientY;
-            return Math.sqrt(dx * dx + dy * dy);
+        function handleStart(e) {
+            if (!userImg) return;
+            isDragging = true;
+            const pos = getPos(e);
+            startX = pos.x - imgX;
+            startY = pos.y - imgY;
         }
 
-        // Eventos Mouse/Touch Start
-        const handleStart = (e) => {
-            if (!userImg) return;
-            if (e.touches && e.touches.length === 2) {
-                initialPinchDistance = getPinchDistance(e);
-            } else {
-                isDragging = true;
-                const pt = getCanvasPoint(e);
-                startX = pt.x - imgX;
-                startY = pt.y - imgY;
-            }
-        };
+        function handleMove(e) {
+            if (!isDragging || !userImg) return;
+            const pos = getPos(e);
+            imgX = pos.x - startX;
+            imgY = pos.y - startY;
+            requestRender();
+        }
 
-        // Eventos Mouse/Touch Move
-        const handleMove = (e) => {
-            if (!userImg) return;
-
-            if (e.touches && e.touches.length === 2) {
-                // Zoom com 2 dedos (Pinch)
-                const currentDist = getPinchDistance(e);
-                if (initialPinchDistance) {
-                    const factor = currentDist / initialPinchDistance;
-                    imgScale *= factor;
-                    initialPinchDistance = currentDist;
-                    render();
-                }
-            } else if (isDragging) {
-                // Mover foto
-                const pt = getCanvasPoint(e);
-                imgX = pt.x - startX;
-                imgY = pt.y - startY;
-                render();
-            }
-        };
-
-        // Eventos Mouse/Touch End
-        const handleEnd = () => {
+        function handleEnd() {
             isDragging = false;
-            initialPinchDistance = null;
-        };
+        }
 
         canvas.addEventListener('mousedown', handleStart);
         canvas.addEventListener('mousemove', handleMove);
@@ -325,16 +293,6 @@
         canvas.addEventListener('touchmove', handleMove, { passive: true });
         canvas.addEventListener('touchend', handleEnd);
 
-        // Zoom com Scroll do Mouse
-        canvas.addEventListener('wheel', (e) => {
-            if (!userImg) return;
-            e.preventDefault();
-            const zoomFactor = e.deltaY < 0 ? 1.05 : 0.95;
-            imgScale *= zoomFactor;
-            render();
-        }, { passive: false });
-
-        // Download da Imagem Final
         downloadBtn.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = 'foto-kizoeira.png';
