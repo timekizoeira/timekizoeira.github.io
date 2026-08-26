@@ -2,19 +2,18 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personalizar Foto - #TIMEKIZOEIRA!</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial Black', Arial, sans-serif;
+            font-family: Arial, sans-serif;
         }
 
         body {
-            background: #0b1a10 url('BG_SITE.webp') no-repeat center center;
-            background-size: cover;
+            background-color: #006028;
             color: #ffffff;
             display: flex;
             flex-direction: column;
@@ -25,7 +24,7 @@
 
         .container {
             width: 100%;
-            max-width: 440px;
+            max-width: 400px;
             padding: 20px 15px;
             display: flex;
             flex-direction: column;
@@ -34,18 +33,8 @@
         }
 
         h1 {
-            font-size: 1.4rem;
-            font-style: italic;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-
-        .subtitle {
-            font-size: 0.85rem;
-            font-family: Arial, sans-serif;
-            font-weight: normal;
-            color: #ffffff !important;
-            margin-bottom: 15px;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
         }
 
         .actions-container {
@@ -53,50 +42,34 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 15px;
+            margin: 15px 0;
         }
 
-        .btn, a.btn, label.btn {
-            display: block !important;
-            width: 100% !important;
-            padding: 14px 10px !important;
-            background: #ffffff !important;
-            color: #006028 !important;
-            text-decoration: none !important;
-            font-size: 0.9rem !important;
-            font-style: italic !important;
-            text-transform: uppercase !important;
-            border-radius: 6px !important;
-            border: 2px solid #006028 !important;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
-            transition: transform 0.1s ease !important;
+        .btn, label.btn {
+            display: block;
+            width: 100%;
+            padding: 14px 10px;
+            background: #ffffff;
+            color: #006028;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            border-radius: 6px;
+            border: 2px solid #006028;
             cursor: pointer;
             text-align: center;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn:active, a.btn:active, label.btn:active {
-            transform: scale(0.98) !important;
         }
 
         .btn:disabled {
-            background: #cccccc !important;
-            color: #666666 !important;
-            border-color: #999999 !important;
+            background: #cccccc;
+            color: #666666;
+            border-color: #999999;
             cursor: not-allowed;
-            box-shadow: none !important;
         }
 
         input[type="file"] {
             display: none !important;
-        }
-
-        .molduras-selector-title {
-            font-size: 0.85rem;
-            font-family: Arial, sans-serif;
-            margin-bottom: 8px;
-            text-transform: uppercase;
         }
 
         .molduras-grid {
@@ -105,73 +78,51 @@
             justify-content: center;
             margin-bottom: 15px;
             width: 100%;
-            overflow-x: auto;
-            padding-bottom: 5px;
         }
 
         .moldura-thumb {
-            width: 55px;
-            height: 55px;
+            width: 50px;
+            height: 50px;
             border: 2px solid #ffffff;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             object-fit: contain;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .moldura-thumb.active {
             border: 3px solid #2EC254;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.8);
         }
 
         .preview-area {
             position: relative;
             width: 100%;
-            max-width: 300px;
+            max-width: 280px;
             margin-bottom: 15px;
-            border: 3px solid #ffffff;
+            border: 2px solid #ffffff;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             overflow: hidden;
-            background: rgba(0,0,0,0.3);
+            background: #000000;
             aspect-ratio: 1 / 1;
         }
 
-        video, canvas {
+        canvas {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        video {
-            display: none;
-        }
-
-        .camera-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            object-fit: contain;
             display: block;
         }
 
         footer {
             width: 100%;
             background-color: #2EC254;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            margin-top: 20px;
         }
 
         .main-logo {
-            max-height: 50px;
-            max-width: 180px;
+            max-height: 40px;
             object-fit: contain;
         }
     </style>
@@ -180,19 +131,18 @@
 
     <div class="container">
         <h1>PERSONALIZAR FOTO</h1>
-        <p class="subtitle">Selecione uma moldura e tire ou carregue sua foto:</p>
 
-        <p class="molduras-selector-title">Escolha a moldura:</p>
+        <p style="font-size:0.8rem; margin-bottom:8px;">Escolha a moldura:</p>
         <div class="molduras-grid">
-            <img src="moldura1.webp" class="moldura-thumb active" onclick="selectMoldura(0, this)" alt="Moldura 1">
-            <img src="moldura2.webp" class="moldura-thumb" onclick="selectMoldura(1, this)" alt="Moldura 2">
-            <img src="moldura3.webp" class="moldura-thumb" onclick="selectMoldura(3, this)" alt="Moldura 3">
-            <img src="moldura4.webp" class="moldura-thumb" onclick="selectMoldura(3, this)" alt="Moldura 4">
-            <img src="moldura5.webp" class="moldura-thumb" onclick="selectMoldura(4, this)" alt="Moldura 5">
+            <img src="moldura1.webp" class="moldura-thumb active" onclick="selectMoldura(0, this)" alt="1">
+            <img src="moldura2.webp" class="moldura-thumb" onclick="selectMoldura(1, this)" alt="2">
+            <img src="moldura3.webp" class="moldura-thumb" onclick="selectMoldura(2, this)" alt="3">
+            <img src="moldura4.webp" class="moldura-thumb" onclick="selectMoldura(3, this)" alt="4">
+            <img src="moldura5.webp" class="moldura-thumb" onclick="selectMoldura(4, this)" alt="5">
         </div>
 
         <div class="actions-container">
-            <label for="cameraInput" class="btn" id="cameraBtnLabel">📸 TIRAR FOTO</label>
+            <label for="cameraInput" class="btn">📸 TIRAR FOTO</label>
             <input type="file" id="cameraInput" accept="image/*" capture="user">
 
             <label for="galleryInput" class="btn">📁 CARREGAR FOTO</label>
@@ -200,9 +150,7 @@
         </div>
 
         <div class="preview-area">
-            <video id="webcam" autoplay playsinline></video>
-            <img id="cameraOverlay" class="camera-overlay" src="moldura1.webp" alt="Overlay Moldura">
-            <canvas id="canvas" style="display:none;"></canvas>
+            <canvas id="canvas"></canvas>
         </div>
 
         <div class="actions-container">
@@ -212,15 +160,12 @@
     </div>
 
     <footer>
-        <img src="LOGOMARCA.webp" alt="Logomarca Principal" class="main-logo">
+        <img src="LOGOMARCA.webp" alt="Logomarca" class="main-logo">
     </footer>
 
     <script>
-        const cameraBtnLabel = document.getElementById('cameraBtnLabel');
         const cameraInput = document.getElementById('cameraInput');
         const galleryInput = document.getElementById('galleryInput');
-        const webcam = document.getElementById('webcam');
-        const cameraOverlay = document.getElementById('cameraOverlay');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const downloadBtn = document.getElementById('downloadBtn');
@@ -233,50 +178,16 @@
             'moldura5.webp'
         ];
 
-        let selectedMolduraSrc = moldurasSrc[0];
+        let selectedMolduraIndex = 0;
         let userImg = null;
-        let streamTrack = null;
-        let isCameraActive = false;
 
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-        if (!isMobile) {
-            cameraBtnLabel.removeAttribute('for');
-            cameraBtnLabel.addEventListener('click', async () => {
-                if (!isCameraActive) {
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ 
-                            video: { width: { ideal: 720 }, height: { ideal: 720 } } 
-                        });
-                        webcam.srcObject = stream;
-                        webcam.style.display = 'block';
-                        cameraOverlay.style.display = 'block';
-                        canvas.style.display = 'none';
-                        
-                        streamTrack = stream.getTracks()[0];
-                        isCameraActive = true;
-                        cameraBtnLabel.innerHTML = '📷 CAPTURAR FOTO';
-                    } catch (err) {
-                        cameraInput.click();
-                    }
-                } else {
-                    userImg = webcam;
-                    render();
-                    
-                    if (streamTrack) streamTrack.stop();
-                    webcam.style.display = 'none';
-                    isCameraActive = false;
-                    cameraBtnLabel.innerHTML = '📸 TIRAR FOTO';
-                }
-            });
-        }
+        canvas.width = 500;
+        canvas.height = 500;
 
         function selectMoldura(index, element) {
             document.querySelectorAll('.moldura-thumb').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
-
-            selectedMolduraSrc = moldurasSrc[index];
-            cameraOverlay.src = selectedMolduraSrc;
+            selectedMolduraIndex = index;
 
             if (userImg) {
                 render();
@@ -286,19 +197,14 @@
         function processFile(file) {
             if (!file) return;
 
-            if (streamTrack) streamTrack.stop();
-            webcam.style.display = 'none';
-            isCameraActive = false;
-            cameraBtnLabel.innerHTML = '📸 TIRAR FOTO';
-
             const reader = new FileReader();
-            reader.onload = (event) => {
+            reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     userImg = img;
                     render();
                 };
-                img.src = event.target.result;
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -307,37 +213,29 @@
         galleryInput.addEventListener('change', (e) => processFile(e.target.files[0]));
 
         function render() {
-            canvas.style.display = 'block';
-            cameraOverlay.style.display = 'block';
-
-            canvas.width = 600;
-            canvas.height = 600;
-
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if (userImg) {
-                const imgWidth = userImg.videoWidth || userImg.width;
-                const imgHeight = userImg.videoHeight || userImg.height;
+                const imgW = userImg.width;
+                const imgH = userImg.height;
+                const ratio = Math.max(canvas.width / imgW, canvas.height / imgH);
+                const cx = (canvas.width - imgW * ratio) / 2;
+                const cy = (canvas.height - imgH * ratio) / 2;
 
-                const ratio = Math.max(canvas.width / imgWidth, canvas.height / imgHeight);
-                const centerShift_x = (canvas.width - imgWidth * ratio) / 2;
-                const centerShift_y = (canvas.height - imgHeight * ratio) / 2;
-
-                ctx.drawImage(userImg, 0, 0, imgWidth, imgHeight,
-                    centerShift_x, centerShift_y, imgWidth * ratio, imgHeight * ratio);
+                ctx.drawImage(userImg, 0, 0, imgW, imgH, cx, cy, imgW * ratio, imgH * ratio);
             }
 
-            const frameImg = new Image();
-            frameImg.onload = () => {
-                ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+            const frame = new Image();
+            frame.onload = () => {
+                ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
                 downloadBtn.disabled = false;
             };
-            frameImg.src = selectedMolduraSrc;
+            frame.src = moldurasSrc[selectedMolduraIndex];
         }
 
         downloadBtn.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = 'foto-moldura-kizoeira.png';
+            link.download = 'foto-kizoeira.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
