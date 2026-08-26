@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Links de Campanha</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Black', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #052244;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Foto de Perfil */
+        .profile-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #00aaff;
+            margin-bottom: 20px;
+        }
+
+        /* Títulos */
+        h1 {
+            font-size: 1.6rem;
+            font-style: italic;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        h1 span {
+            color: #ffffff;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            font-family: Arial, sans-serif;
+            font-weight: normal;
+            color: #79a6d2;
+            margin-bottom: 25px;
+        }
+
+        /* Lista de Botões */
+        .links-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-link {
+            display: block;
+            width: 100%;
+            padding: 14px 10px;
+            background: linear-gradient(180deg, #007cc2 0%, #005691 100%);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-style: italic;
+            text-transform: uppercase;
+            border-radius: 6px;
+            border-bottom: 4px solid #003a63;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-link:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(180deg, #008be0 0%, #0064a8 100%);
+        }
+
+        /* Rodapé com Logomarcas */
+        footer {
+            width: 100%;
+            background-color: #124c8c;
+            padding: 25px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .footer-logo {
+            max-height: 55px;
+            max-width: 200px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- FOTO DO PERFIL: Substitua 'perfil.png' pela sua foto -->
+        <img src="perfil.png" alt="Foto de Perfil" class="profile-img">
+
+        <h1>CHEGOU A HORA DE <span>FUFUCA!</span></h1>
+        <p class="subtitle">Baixe os materiais e participe da nossa campanha!</p>
+
+        <!-- LISTA DE BOTÕES: Altere os href="#" pelos links desejados -->
+        <div class="links-container">
+            <a href="#" class="btn-link" target="_blank">PERSONALIZE SUA FOTO DO PERFIL</a>
+            <a href="#" class="btn-link" target="_blank">MATERIAIS DE CAMPANHA</a>
+            <a href="#" class="btn-link" target="_blank">CARDS DE APOIO</a>
+            <a href="#" class="btn-link" target="_blank">FOTOS E VÍDEOS</a>
+            <a href="#" class="btn-link" target="_blank">MÚSICAS DA CAMPANHA</a>
+            <a href="#" class="btn-link" target="_blank">FUNDO DE TELA PARA CELULAR</a>
+            <a href="#" class="btn-link" target="_blank">SPOTIFY DO FUFUCA</a>
+            <a href="#" class="btn-link" target="_blank">ACESSE O SITE</a>
+        </div>
+    </div>
+
+    <!-- RODAPÉ DE LOGOMARCAS -->
+    <footer>
+        <!-- Adicione ou substitua os arquivos PNG das logomarcas aqui -->
+        <img src="logo-principal.png" alt="Logomarca Principal" class="footer-logo">
+        <!-- Exemplo para adicionar mais uma logo no rodapé: -->
+        <!-- <img src="logo-parceiro.png" alt="Logomarca Parceiro" class="footer-logo"> -->
+    </footer>
+
+</body>
+</html>
