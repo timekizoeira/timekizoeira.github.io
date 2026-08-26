@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personalizar Foto - #TIMEKIZOEIRA!</title>
+    
+    <!-- Console de Diagnóstico no Celular -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+
     <style>
         * {
             margin: 0;
@@ -51,14 +56,13 @@
             padding: 14px 10px;
             background: #ffffff;
             color: #006028;
-            text-decoration: none;
             font-weight: bold;
             font-size: 0.9rem;
-            text-transform: uppercase;
             border-radius: 6px;
             border: 2px solid #006028;
             cursor: pointer;
             text-align: center;
+            text-decoration: none;
         }
 
         .btn:disabled {
@@ -72,31 +76,7 @@
             display: none !important;
         }
 
-        .molduras-grid {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 15px;
-            width: 100%;
-        }
-
-        .moldura-thumb {
-            width: 50px;
-            height: 50px;
-            border: 2px solid #ffffff;
-            border-radius: 6px;
-            cursor: pointer;
-            object-fit: contain;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .moldura-thumb.active {
-            border: 3px solid #2EC254;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
         .preview-area {
-            position: relative;
             width: 100%;
             max-width: 280px;
             margin-bottom: 15px;
@@ -120,26 +100,12 @@
             display: flex;
             justify-content: center;
         }
-
-        .main-logo {
-            max-height: 40px;
-            object-fit: contain;
-        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>PERSONALIZAR FOTO</h1>
-
-        <p style="font-size:0.8rem; margin-bottom:8px;">Escolha a moldura:</p>
-        <div class="molduras-grid">
-            <img src="moldura1.webp" class="moldura-thumb active" onclick="selectMoldura(0, this)" alt="1">
-            <img src="moldura2.webp" class="moldura-thumb" onclick="selectMoldura(1, this)" alt="2">
-            <img src="moldura3.webp" class="moldura-thumb" onclick="selectMoldura(2, this)" alt="3">
-            <img src="moldura4.webp" class="moldura-thumb" onclick="selectMoldura(3, this)" alt="4">
-            <img src="moldura5.webp" class="moldura-thumb" onclick="selectMoldura(4, this)" alt="5">
-        </div>
 
         <div class="actions-container">
             <label for="cameraInput" class="btn">📸 TIRAR FOTO</label>
@@ -160,7 +126,7 @@
     </div>
 
     <footer>
-        <img src="LOGOMARCA.webp" alt="Logomarca" class="main-logo">
+        <p>#TIMEKIZOEIRA</p>
     </footer>
 
     <script>
@@ -170,39 +136,18 @@
         const ctx = canvas.getContext('2d');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        const moldurasSrc = [
-            'moldura1.webp',
-            'moldura2.webp',
-            'moldura3.webp',
-            'moldura4.webp',
-            'moldura5.webp'
-        ];
-
-        let selectedMolduraIndex = 0;
-        let userImg = null;
-
-        canvas.width = 500;
-        canvas.height = 500;
-
-        function selectMoldura(index, element) {
-            document.querySelectorAll('.moldura-thumb').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-            selectedMolduraIndex = index;
-
-            if (userImg) {
-                render();
-            }
-        }
+        canvas.width = 400;
+        canvas.height = 400;
 
         function processFile(file) {
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    userImg = img;
-                    render();
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    downloadBtn.disabled = false;
                 };
                 img.src = e.target.result;
             };
@@ -211,27 +156,6 @@
 
         cameraInput.addEventListener('change', (e) => processFile(e.target.files[0]));
         galleryInput.addEventListener('change', (e) => processFile(e.target.files[0]));
-
-        function render() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (userImg) {
-                const imgW = userImg.width;
-                const imgH = userImg.height;
-                const ratio = Math.max(canvas.width / imgW, canvas.height / imgH);
-                const cx = (canvas.width - imgW * ratio) / 2;
-                const cy = (canvas.height - imgH * ratio) / 2;
-
-                ctx.drawImage(userImg, 0, 0, imgW, imgH, cx, cy, imgW * ratio, imgH * ratio);
-            }
-
-            const frame = new Image();
-            frame.onload = () => {
-                ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
-                downloadBtn.disabled = false;
-            };
-            frame.src = moldurasSrc[selectedMolduraIndex];
-        }
 
         downloadBtn.addEventListener('click', () => {
             const link = document.createElement('a');
