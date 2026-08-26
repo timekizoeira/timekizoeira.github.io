@@ -134,23 +134,40 @@
             background: rgba(255, 255, 255, 0.9);
         }
 
+        /* Área de visualização com moldura por cima */
         .preview-area {
             position: relative;
             width: 100%;
             max-width: 350px;
             margin-bottom: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            background: rgba(0,0,0,0.2);
+            aspect-ratio: 1 / 1;
         }
 
         video, canvas {
             width: 100%;
-            height: auto;
-            border: 3px solid #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            background: rgba(0,0,0,0.2);
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         video {
+            display: none;
+        }
+
+        /* Moldura sobreposta ao vídeo da câmera ao vivo */
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            object-fit: contain;
             display: none;
         }
 
@@ -184,7 +201,7 @@
             <img src="moldura1.webp" class="moldura-thumb active" onclick="selectMoldura(0, this)" alt="Moldura 1">
             <img src="moldura2.webp" class="moldura-thumb" onclick="selectMoldura(1, this)" alt="Moldura 2">
             <img src="moldura3.webp" class="moldura-thumb" onclick="selectMoldura(2, this)" alt="Moldura 3">
-            <img src="moldura4.webp" class="moldura-thumb" onclick="selectMoldura(4, this)" alt="Moldura 4">
+            <img src="moldura4.webp" class="moldura-thumb" onclick="selectMoldura(3, this)" alt="Moldura 4">
             <img src="moldura5.webp" class="moldura-thumb" onclick="selectMoldura(4, this)" alt="Moldura 5">
         </div>
 
@@ -198,6 +215,7 @@
 
         <div class="preview-area">
             <video id="webcam" autoplay playsinline></video>
+            <img id="cameraOverlay" class="camera-overlay" src="moldura1.webp" alt="Overlay Moldura">
             <canvas id="canvas"></canvas>
         </div>
 
@@ -216,11 +234,11 @@
         const mobileCameraInput = document.getElementById('mobileCameraInput');
         const galleryInput = document.getElementById('galleryInput');
         const webcam = document.getElementById('webcam');
+        const cameraOverlay = document.getElementById('cameraOverlay');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        // Lista das 5 Molduras em formato .webp
         const moldurasSrc = [
             'moldura1.webp',
             'moldura2.webp',
@@ -238,14 +256,20 @@
 
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+        // Troca a moldura (funciona ANTES e DEPOIS da captura)
         function selectMoldura(index, element) {
             document.querySelectorAll('.moldura-thumb').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
+            const novaSrc = moldurasSrc[index];
+            cameraOverlay.src = novaSrc;
+
             currentMoldura = new Image();
-            currentMoldura.src = moldurasSrc[index];
+            currentMoldura.src = novaSrc;
             currentMoldura.onload = () => {
-                render();
+                if (canvas.style.display !== 'none') {
+                    render();
+                }
             };
         }
 
@@ -260,6 +284,7 @@
                         });
                         webcam.srcObject = stream;
                         webcam.style.display = 'block';
+                        cameraOverlay.style.display = 'block';
                         canvas.style.display = 'none';
                         
                         streamTrack = stream.getTracks()[0];
@@ -274,6 +299,7 @@
                     
                     if (streamTrack) streamTrack.stop();
                     webcam.style.display = 'none';
+                    cameraOverlay.style.display = 'none';
                     canvas.style.display = 'block';
 
                     isCameraActive = false;
@@ -287,6 +313,7 @@
 
             if (streamTrack) streamTrack.stop();
             webcam.style.display = 'none';
+            cameraOverlay.style.display = 'none';
             canvas.style.display = 'block';
             isCameraActive = false;
             cameraBtn.innerHTML = '📸 TIRAR FOTO';
