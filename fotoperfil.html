@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalizar Foto - #TIMEKIZOEIRA!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Black', Arial, sans-serif;
+        }
+
+        body {
+            background-image: url('BG_SITE.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-style: italic;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            font-family: Arial, sans-serif;
+            font-weight: normal;
+            color: #ffffff !important;
+            margin-bottom: 25px;
+        }
+
+        /* Container de botões */
+        .actions-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilo dos Botões da Campanha */
+        .btn, a.btn {
+            display: block !important;
+            width: 100% !important;
+            padding: 14px 10px !important;
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            color: #006028 !important;
+            text-decoration: none !important;
+            font-size: 0.9rem !important;
+            font-style: italic !important;
+            text-transform: uppercase !important;
+            border-radius: 6px !important;
+            border: 2px solid #006028 !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn:hover, a.btn:hover {
+            transform: translateY(-2px) !important;
+            background: #006028 !important;
+            background-color: #006028 !important;
+            color: #ffffff !important;
+            border-color: #006028 !important;
+        }
+
+        .btn:disabled {
+            background: #cccccc !important;
+            color: #666666 !important;
+            border-color: #999999 !important;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Esconde os inputs file nativos */
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Moldura + Canvas de prévia */
+        canvas {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+            border: 3px solid #ffffff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            background: rgba(0,0,0,0.2);
+        }
+
+        footer {
+            width: 100%;
+            background-color: #2EC254;
+            padding: 25px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .main-logo {
+            max-height: 55px;
+            max-width: 200px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>PERSONALIZAR FOTO</h1>
+        <p class="subtitle">Escolha uma opção para colocar sua foto na moldura:</p>
+
+        <!-- Botões para selecionar ou tirar foto -->
+        <div class="actions-container">
+            <!-- Opção 1: Tirar Foto (Câmera) -->
+            <button class="btn" onclick="document.getElementById('cameraInput').click();">📸 TIRAR FOTO</button>
+            <input type="file" id="cameraInput" accept="image/*" capture="user">
+
+            <!-- Opção 2: Carregar Foto (Galeria / Arquivos) -->
+            <button class="btn" onclick="document.getElementById('galleryInput').click();">📁 CARREGAR FOTO</button>
+            <input type="file" id="galleryInput" accept="image/*">
+        </div>
+
+        <!-- Canvas da moldura -->
+        <canvas id="canvas"></canvas>
+
+        <!-- Ações Finais -->
+        <div class="actions-container">
+            <button id="downloadBtn" class="btn" disabled>💾 BAIXAR FOTO PRONTA</button>
+            <a href="index.html" class="btn">⬅️ VOLTAR</a>
+        </div>
+    </div>
+
+    <footer>
+        <img src="LOGOMARCA.webp" alt="Logomarca Principal" class="main-logo">
+    </footer>
+
+    <script>
+        const cameraInput = document.getElementById('cameraInput');
+        const galleryInput = document.getElementById('galleryInput');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Moldura PNG Transparente
+        const moldura = new Image();
+        moldura.src = 'moldura.png';
+
+        let userImg = null;
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                userImg = new Image();
+                userImg.onload = render;
+                userImg.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        cameraInput.addEventListener('change', handleImageUpload);
+        galleryInput.addEventListener('change', handleImageUpload);
+
+        function render() {
+            canvas.width = moldura.width || 1080;
+            canvas.height = moldura.height || 1080;
+
+            // 1. Desenha a foto do usuário no fundo
+            if (userImg) {
+                ctx.drawImage(userImg, 0, 0, canvas.width, canvas.height);
+            }
+
+            // 2. Desenha a moldura por cima
+            ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
+
+            // Ativa o botão de download
+            downloadBtn.disabled = false;
+        }
+
+        // Exibe a prévia da moldura na tela
+        moldura.onload = () => {
+            canvas.width = moldura.width || 1080;
+            canvas.height = moldura.height || 1080;
+            ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
+        };
+
+        // Baixa a imagem gerada
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'foto-moldura-kizoeira.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    </script>
+</body>
+</html>
