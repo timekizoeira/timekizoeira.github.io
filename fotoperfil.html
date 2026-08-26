@@ -29,7 +29,7 @@
         .container {
             width: 100%;
             max-width: 480px;
-            padding: 40px 20px;
+            padding: 30px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -49,7 +49,7 @@
             font-family: Arial, sans-serif;
             font-weight: normal;
             color: #ffffff !important;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         .actions-container {
@@ -57,7 +57,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .btn, a.btn {
@@ -97,6 +97,41 @@
 
         input[type="file"] {
             display: none;
+        }
+
+        .molduras-selector-title {
+            font-size: 0.85rem;
+            font-family: Arial, sans-serif;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .molduras-grid {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .moldura-thumb {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .moldura-thumb.active {
+            border: 3px solid #2EC254;
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(46, 194, 84, 0.8);
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .preview-area {
@@ -141,14 +176,22 @@
 
     <div class="container">
         <h1>PERSONALIZAR FOTO</h1>
-        <p class="subtitle">Tire uma foto ou escolha uma da sua galeria:</p>
+        <p class="subtitle">Selecione uma moldura e tire ou carregue sua foto:</p>
+
+        <!-- SELETOR DAS 5 MOLDURAS WEBP -->
+        <p class="molduras-selector-title">Escolha a moldura:</p>
+        <div class="molduras-grid">
+            <img src="moldura1.webp" class="moldura-thumb active" onclick="selectMoldura(0, this)" alt="Moldura 1">
+            <img src="moldura2.webp" class="moldura-thumb" onclick="selectMoldura(1, this)" alt="Moldura 2">
+            <img src="moldura3.webp" class="moldura-thumb" onclick="selectMoldura(2, this)" alt="Moldura 3">
+            <img src="moldura4.webp" class="moldura-thumb" onclick="selectMoldura(4, this)" alt="Moldura 4">
+            <img src="moldura5.webp" class="moldura-thumb" onclick="selectMoldura(4, this)" alt="Moldura 5">
+        </div>
 
         <div class="actions-container">
-            <!-- Um único botão que alterna entre Abrir Câmera e Capturar -->
             <button class="btn" id="cameraBtn">📸 TIRAR FOTO</button>
             <input type="file" id="mobileCameraInput" accept="image/*" capture="user">
 
-            <!-- Botão para escolher da galeria ou arquivos -->
             <button class="btn" onclick="document.getElementById('galleryInput').click();">📁 CARREGAR FOTO</button>
             <input type="file" id="galleryInput" accept="image/*">
         </div>
@@ -177,8 +220,17 @@
         const ctx = canvas.getContext('2d');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        const moldura = new Image();
-        moldura.src = 'moldura.png';
+        // Lista das 5 Molduras em formato .webp
+        const moldurasSrc = [
+            'moldura1.webp',
+            'moldura2.webp',
+            'moldura3.webp',
+            'moldura4.webp',
+            'moldura5.webp'
+        ];
+
+        let currentMoldura = new Image();
+        currentMoldura.src = moldurasSrc[0];
 
         let userImg = null;
         let streamTrack = null;
@@ -186,12 +238,21 @@
 
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+        function selectMoldura(index, element) {
+            document.querySelectorAll('.moldura-thumb').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            currentMoldura = new Image();
+            currentMoldura.src = moldurasSrc[index];
+            currentMoldura.onload = () => {
+                render();
+            };
+        }
+
         cameraBtn.addEventListener('click', async () => {
             if (isMobile) {
-                // No celular: abre direto o app de câmera
                 mobileCameraInput.click();
             } else {
-                // No computador: alterna entre abrir a câmera e capturar a foto
                 if (!isCameraActive) {
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -203,14 +264,11 @@
                         
                         streamTrack = stream.getTracks()[0];
                         isCameraActive = true;
-                        
-                        // Muda o texto do botão para Capturar
                         cameraBtn.innerHTML = '📷 CAPTURAR FOTO';
                     } catch (err) {
                         mobileCameraInput.click();
                     }
                 } else {
-                    // Tira a foto da webcam
                     userImg = webcam;
                     render();
                     
@@ -246,8 +304,8 @@
         galleryInput.addEventListener('change', (e) => processFile(e.target.files[0]));
 
         function render() {
-            canvas.width = moldura.width || 1080;
-            canvas.height = moldura.height || 1080;
+            canvas.width = currentMoldura.width || 1080;
+            canvas.height = currentMoldura.height || 1080;
 
             if (userImg) {
                 const imgWidth = userImg.videoWidth || userImg.width;
@@ -261,16 +319,17 @@
 
                 ctx.drawImage(userImg, 0, 0, imgWidth, imgHeight,
                     centerShift_x, centerShift_y, imgWidth * ratio, imgHeight * ratio);
+                
+                downloadBtn.disabled = false;
             }
 
-            ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
-            downloadBtn.disabled = false;
+            ctx.drawImage(currentMoldura, 0, 0, canvas.width, canvas.height);
         }
 
-        moldura.onload = () => {
-            canvas.width = moldura.width || 1080;
-            canvas.height = moldura.height || 1080;
-            ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
+        currentMoldura.onload = () => {
+            canvas.width = currentMoldura.width || 1080;
+            canvas.height = currentMoldura.height || 1080;
+            ctx.drawImage(currentMoldura, 0, 0, canvas.width, canvas.height);
         };
 
         downloadBtn.addEventListener('click', () => {
