@@ -52,7 +52,6 @@
             margin-bottom: 25px;
         }
 
-        /* Container de botões */
         .actions-container {
             width: 100%;
             display: flex;
@@ -61,7 +60,6 @@
             margin-bottom: 20px;
         }
 
-        /* Estilo dos Botões da Campanha */
         .btn, a.btn {
             display: block !important;
             width: 100% !important;
@@ -97,21 +95,28 @@
             transform: none !important;
         }
 
-        /* Esconde os inputs file nativos */
         input[type="file"] {
             display: none;
         }
 
-        /* Moldura + Canvas de prévia */
-        canvas {
+        .preview-area {
+            position: relative;
             width: 100%;
             max-width: 350px;
+            margin-bottom: 20px;
+        }
+
+        video, canvas {
+            width: 100%;
             height: auto;
             border: 3px solid #ffffff;
             border-radius: 8px;
-            margin-bottom: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             background: rgba(0,0,0,0.2);
+        }
+
+        video {
+            display: none;
         }
 
         footer {
@@ -136,23 +141,26 @@
 
     <div class="container">
         <h1>PERSONALIZAR FOTO</h1>
-        <p class="subtitle">Escolha uma opção para colocar sua foto na moldura:</p>
+        <p class="subtitle">Tire uma foto ou escolha uma da sua galeria:</p>
 
-        <!-- Botões para selecionar ou tirar foto -->
         <div class="actions-container">
-            <!-- Opção 1: Tirar Foto (Câmera) -->
-            <button class="btn" onclick="document.getElementById('cameraInput').click();">📸 TIRAR FOTO</button>
-            <input type="file" id="cameraInput" accept="image/*" capture="user">
+            <!-- Botão inteligente para tirar foto -->
+            <button class="btn" id="takePhotoBtn">📸 TIRAR FOTO</button>
+            <input type="file" id="mobileCameraInput" accept="image/*" capture="user">
 
-            <!-- Opção 2: Carregar Foto (Galeria / Arquivos) -->
+            <!-- Botão de capturar webcam (visível só no PC quando a câmera tá aberta) -->
+            <button class="btn" id="captureWebcamBtn" style="display: none;">📷 CAPTURAR FOTO</button>
+
+            <!-- Botão para escolher da galeria/pastas -->
             <button class="btn" onclick="document.getElementById('galleryInput').click();">📁 CARREGAR FOTO</button>
             <input type="file" id="galleryInput" accept="image/*">
         </div>
 
-        <!-- Canvas da moldura -->
-        <canvas id="canvas"></canvas>
+        <div class="preview-area">
+            <video id="webcam" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+        </div>
 
-        <!-- Ações Finais -->
         <div class="actions-container">
             <button id="downloadBtn" class="btn" disabled>💾 BAIXAR FOTO PRONTA</button>
             <a href="index.html" class="btn">⬅️ VOLTAR</a>
@@ -164,21 +172,69 @@
     </footer>
 
     <script>
-        const cameraInput = document.getElementById('cameraInput');
+        const takePhotoBtn = document.getElementById('takePhotoBtn');
+        const mobileCameraInput = document.getElementById('mobileCameraInput');
+        const captureWebcamBtn = document.getElementById('captureWebcamBtn');
         const galleryInput = document.getElementById('galleryInput');
+        const webcam = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        // Moldura PNG Transparente
         const moldura = new Image();
         moldura.src = 'moldura.png';
 
         let userImg = null;
+        let streamTrack = null;
 
-        function handleImageUpload(e) {
-            const file = e.target.files[0];
+        // Detecta se é celular/tablet ou computador
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        takePhotoBtn.addEventListener('click', async () => {
+            if (isMobile) {
+                // No celular: abre o aplicativo de câmera direto
+                mobileCameraInput.click();
+            } else {
+                // No notebook/computador: abre a webcam ao vivo
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { width: { ideal: 1080 }, height: { ideal: 1080 } } 
+                    });
+                    webcam.srcObject = stream;
+                    webcam.style.display = 'block';
+                    canvas.style.display = 'none';
+                    
+                    streamTrack = stream.getTracks()[0];
+                    
+                    takePhotoBtn.style.display = 'none';
+                    captureWebcamBtn.style.display = 'block';
+                } catch (err) {
+                    // Caso o computador não tenha webcam, abre a janela de arquivos
+                    mobileCameraInput.click();
+                }
+            }
+        });
+
+        // Captura foto da webcam (Notebook)
+        captureWebcamBtn.addEventListener('click', () => {
+            userImg = webcam;
+            render();
+            
+            if (streamTrack) streamTrack.stop();
+            webcam.style.display = 'none';
+            canvas.style.display = 'block';
+
+            captureWebcamBtn.style.display = 'none';
+            takePhotoBtn.style.display = 'block';
+        });
+
+        // Processa imagem tirada no celular ou escolhida da galeria
+        function processFile(file) {
             if (!file) return;
+
+            if (streamTrack) streamTrack.stop();
+            webcam.style.display = 'none';
+            canvas.style.display = 'block';
 
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -189,33 +245,37 @@
             reader.readAsDataURL(file);
         }
 
-        cameraInput.addEventListener('change', handleImageUpload);
-        galleryInput.addEventListener('change', handleImageUpload);
+        mobileCameraInput.addEventListener('change', (e) => processFile(e.target.files[0]));
+        galleryInput.addEventListener('change', (e) => processFile(e.target.files[0]));
 
         function render() {
             canvas.width = moldura.width || 1080;
             canvas.height = moldura.height || 1080;
 
-            // 1. Desenha a foto do usuário no fundo
             if (userImg) {
-                ctx.drawImage(userImg, 0, 0, canvas.width, canvas.height);
+                const imgWidth = userImg.videoWidth || userImg.width;
+                const imgHeight = userImg.videoHeight || userImg.height;
+
+                const hRatio = canvas.width / imgWidth;
+                const vRatio = canvas.height / imgHeight;
+                const ratio = Math.max(hRatio, vRatio);
+                const centerShift_x = (canvas.width - imgWidth * ratio) / 2;
+                const centerShift_y = (canvas.height - imgHeight * ratio) / 2;
+
+                ctx.drawImage(userImg, 0, 0, imgWidth, imgHeight,
+                    centerShift_x, centerShift_y, imgWidth * ratio, imgHeight * ratio);
             }
 
-            // 2. Desenha a moldura por cima
             ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
-
-            // Ativa o botão de download
             downloadBtn.disabled = false;
         }
 
-        // Exibe a prévia da moldura na tela
         moldura.onload = () => {
             canvas.width = moldura.width || 1080;
             canvas.height = moldura.height || 1080;
             ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
         };
 
-        // Baixa a imagem gerada
         downloadBtn.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = 'foto-moldura-kizoeira.png';
