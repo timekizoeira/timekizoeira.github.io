@@ -36,7 +36,7 @@
             text-align: center;
         }
 
-        /* Foto de Perfil / PNG Transparente */
+        /* Foto de Perfil / Emoji PNG */
         .profile-pic {
             width: 180px;
             height: auto;
@@ -65,7 +65,7 @@
             margin-bottom: 25px;
         }
 
-        /* Lista de Botões */
+        /* Container da Lista de Botões */
         .links-container {
             width: 100%;
             display: flex;
@@ -73,19 +73,34 @@
             gap: 12px;
         }
 
-.btn-link {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    color: #006028 !important;
-    border: 2px solid #006028;
-}
+        /* ESTILO DOS BOTÕES (Sobrescreve qualquer regra azul antiga) */
+        .btn, .btn-link, a.btn, a.btn-link, .links-container a {
+            display: block !important;
+            width: 100% !important;
+            padding: 14px 10px !important;
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            background-image: none !important;
+            color: #006028 !important;
+            text-decoration: none !important;
+            font-size: 0.9rem !important;
+            font-style: italic !important;
+            text-transform: uppercase !important;
+            border-radius: 6px !important;
+            border: 2px solid #006028 !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
 
-.btn-link:hover {
-    background: #006028 !important;
-    background-color: #006028 !important;
-    color: #ffffff !important;
-    border-color: #006028;
-}
+        /* EFITO HOVER (Passar o mouse sobre os botões) */
+        .btn:hover, .btn-link:hover, a.btn:hover, a.btn-link:hover, .links-container a:hover {
+            transform: translateY(-2px) !important;
+            background: #006028 !important;
+            background-color: #006028 !important;
+            background-image: none !important;
+            color: #ffffff !important;
+            border-color: #006028 !important;
+        }
 
         /* Rodapé com Logomarcas */
         footer {
@@ -109,7 +124,7 @@
 <body>
 
     <div class="container">
-        <!-- LOGOMARCA / EMOJI PNG -->
+        <!-- FOTO DE PERFIL / EMOJI PNG -->
         <img src="EMOJI MAR.png" alt="Emoji Mar" class="profile-pic">
 
         <h1>#TIME<span>KIZOEIRA!</span></h1>
@@ -124,11 +139,11 @@
             <a href="#" class="btn-link" target="_blank">MÚSICAS DA CAMPANHA</a>
             <a href="#" class="btn-link" target="_blank">FUNDO DE TELA PARA CELULAR</a>
             <a href="https://www.instagram.com/marciodokizoeira/" class="btn-link" target="_blank">INSTAGRAM</a>
-            <a href="https://wa.me/559881318522" class="btn-link" target="_blank">GRUPO DO WHATSAPP</a>
+            <a href="https://wa.me/559881318522" class="btn-link" target="_blank">WHATSAPP</a>
         </div>
     </div>
 
-    <!-- RODAPÉ DE LOGOMARCAS -->
+    <!-- RODAPÉ -->
     <footer>
         <img src="LOGOMARCA.webp" alt="Logomarca Principal" class="main-logo">
     </footer>
