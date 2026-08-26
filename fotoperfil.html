@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Personalizar Foto - #TIMEKIZOEIRA!</title>
     <style>
         * {
@@ -13,10 +13,8 @@
         }
 
         body {
-            background-image: url('BG_SITE.webp');
+            background: #0b1a10 url('BG_SITE.webp') no-repeat center center;
             background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
             color: #ffffff;
             display: flex;
             flex-direction: column;
@@ -27,7 +25,7 @@
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 440px;
             padding: 20px 15px;
             display: flex;
             flex-direction: column;
@@ -71,17 +69,15 @@
             border-radius: 6px !important;
             border: 2px solid #006028 !important;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
-            transition: all 0.2s ease !important;
+            transition: transform 0.1s ease !important;
             cursor: pointer;
             text-align: center;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .btn:hover, a.btn:hover, label.btn:hover {
-            background: #006028 !important;
-            color: #ffffff !important;
-            border-color: #006028 !important;
+        .btn:active, a.btn:active, label.btn:active {
+            transform: scale(0.98) !important;
         }
 
         .btn:disabled {
@@ -89,6 +85,7 @@
             color: #666666 !important;
             border-color: #999999 !important;
             cursor: not-allowed;
+            box-shadow: none !important;
         }
 
         input[type="file"] {
@@ -124,20 +121,19 @@
 
         .moldura-thumb.active {
             border: 3px solid #2EC254;
-            transform: scale(1.05);
             background: rgba(255, 255, 255, 0.9);
         }
 
         .preview-area {
             position: relative;
             width: 100%;
-            max-width: 320px;
+            max-width: 300px;
             margin-bottom: 15px;
             border: 3px solid #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             overflow: hidden;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.3);
             aspect-ratio: 1 / 1;
         }
 
@@ -160,7 +156,7 @@
             height: 100%;
             pointer-events: none;
             object-fit: contain;
-            display: none;
+            display: block;
         }
 
         footer {
@@ -190,7 +186,7 @@
         <div class="molduras-grid">
             <img src="moldura1.webp" class="moldura-thumb active" onclick="selectMoldura(0, this)" alt="Moldura 1">
             <img src="moldura2.webp" class="moldura-thumb" onclick="selectMoldura(1, this)" alt="Moldura 2">
-            <img src="moldura3.webp" class="moldura-thumb" onclick="selectMoldura(2, this)" alt="Moldura 3">
+            <img src="moldura3.webp" class="moldura-thumb" onclick="selectMoldura(3, this)" alt="Moldura 3">
             <img src="moldura4.webp" class="moldura-thumb" onclick="selectMoldura(3, this)" alt="Moldura 4">
             <img src="moldura5.webp" class="moldura-thumb" onclick="selectMoldura(4, this)" alt="Moldura 5">
         </div>
@@ -206,7 +202,7 @@
         <div class="preview-area">
             <video id="webcam" autoplay playsinline></video>
             <img id="cameraOverlay" class="camera-overlay" src="moldura1.webp" alt="Overlay Moldura">
-            <canvas id="canvas"></canvas>
+            <canvas id="canvas" style="display:none;"></canvas>
         </div>
 
         <div class="actions-container">
@@ -226,7 +222,7 @@
         const webcam = document.getElementById('webcam');
         const cameraOverlay = document.getElementById('cameraOverlay');
         const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const ctx = canvas.getContext('2d');
         const downloadBtn = document.getElementById('downloadBtn');
 
         const moldurasSrc = [
@@ -237,14 +233,12 @@
             'moldura5.webp'
         ];
 
-        let currentMoldura = new Image();
-        currentMoldura.src = moldurasSrc[0];
-
+        let selectedMolduraSrc = moldurasSrc[0];
         let userImg = null;
         let streamTrack = null;
         let isCameraActive = false;
 
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         if (!isMobile) {
             cameraBtnLabel.removeAttribute('for');
@@ -271,9 +265,6 @@
                     
                     if (streamTrack) streamTrack.stop();
                     webcam.style.display = 'none';
-                    cameraOverlay.style.display = 'none';
-                    canvas.style.display = 'block';
-
                     isCameraActive = false;
                     cameraBtnLabel.innerHTML = '📸 TIRAR FOTO';
                 }
@@ -284,16 +275,12 @@
             document.querySelectorAll('.moldura-thumb').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
-            const novaSrc = moldurasSrc[index];
-            cameraOverlay.src = novaSrc;
+            selectedMolduraSrc = moldurasSrc[index];
+            cameraOverlay.src = selectedMolduraSrc;
 
-            currentMoldura = new Image();
-            currentMoldura.src = novaSrc;
-            currentMoldura.onload = () => {
-                if (canvas.style.display !== 'none') {
-                    render();
-                }
-            };
+            if (userImg) {
+                render();
+            }
         }
 
         function processFile(file) {
@@ -301,8 +288,6 @@
 
             if (streamTrack) streamTrack.stop();
             webcam.style.display = 'none';
-            cameraOverlay.style.display = 'none';
-            canvas.style.display = 'block';
             isCameraActive = false;
             cameraBtnLabel.innerHTML = '📸 TIRAR FOTO';
 
@@ -322,9 +307,11 @@
         galleryInput.addEventListener('change', (e) => processFile(e.target.files[0]));
 
         function render() {
-            // Define dimensões fixas moderadas para evitar estouro de memória no Safari
-            canvas.width = 800;
-            canvas.height = 800;
+            canvas.style.display = 'block';
+            cameraOverlay.style.display = 'block';
+
+            canvas.width = 600;
+            canvas.height = 600;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -332,26 +319,21 @@
                 const imgWidth = userImg.videoWidth || userImg.width;
                 const imgHeight = userImg.videoHeight || userImg.height;
 
-                const hRatio = canvas.width / imgWidth;
-                const vRatio = canvas.height / imgHeight;
-                const ratio = Math.max(hRatio, vRatio);
+                const ratio = Math.max(canvas.width / imgWidth, canvas.height / imgHeight);
                 const centerShift_x = (canvas.width - imgWidth * ratio) / 2;
                 const centerShift_y = (canvas.height - imgHeight * ratio) / 2;
 
                 ctx.drawImage(userImg, 0, 0, imgWidth, imgHeight,
                     centerShift_x, centerShift_y, imgWidth * ratio, imgHeight * ratio);
-                
-                downloadBtn.disabled = false;
             }
 
-            ctx.drawImage(currentMoldura, 0, 0, canvas.width, canvas.height);
+            const frameImg = new Image();
+            frameImg.onload = () => {
+                ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+                downloadBtn.disabled = false;
+            };
+            frameImg.src = selectedMolduraSrc;
         }
-
-        currentMoldura.onload = () => {
-            canvas.width = 800;
-            canvas.height = 800;
-            ctx.drawImage(currentMoldura, 0, 0, canvas.width, canvas.height);
-        };
 
         downloadBtn.addEventListener('click', () => {
             const link = document.createElement('a');
