@@ -177,11 +177,9 @@
         </div>
 
         <div class="actions-container">
-            <!-- Botão de Câmera Direta -->
             <label for="cameraInput" class="btn">📷 TIRAR FOTO (CÂMERA)</label>
             <input type="file" id="cameraInput" accept="image/*" capture="user">
 
-            <!-- Botão de Galeria de Fotos -->
             <label for="galleryInput" class="btn">📁 CARREGAR DA GALERIA</label>
             <input type="file" id="galleryInput" accept="image/*">
         </div>
@@ -199,7 +197,7 @@
         <p class="instructions">💡 Arraste com o dedo para mover a foto ao fundo.</p>
 
         <div class="actions-container">
-            <button id="downloadBtn" class="btn" disabled>💾 BAIXAR FOTO PRONTA</button>
+            <button id="downloadBtn" class="btn" disabled>💾 BAIXAR / SALVAR FOTO</button>
             <a href="index.html" class="btn">⬅️ VOLTAR</a>
         </div>
     </div>
@@ -257,7 +255,6 @@
                 });
             });
 
-            // Função única de processamento leve de imagem para Câmera e Galeria
             function processImageFile(file) {
                 if (!file) return;
 
@@ -402,18 +399,39 @@
             canvas.addEventListener('touchmove', handleMove, { passive: false });
             canvas.addEventListener('touchend', handleEnd);
 
+            // SISTEMA DIRETO DE SALVAMENTO PARA CELULAR
             downloadBtn.addEventListener('click', () => {
-                try {
-                    const dataUrl = canvas.toDataURL('image/png');
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return;
+
+                    const fileName = 'foto-kizoeira.png';
+                    const file = new File([blob], fileName, { type: 'image/png' });
+
+                    // No Celular (iPhone / Android): usa compartilhamento nativo para salvar na Galeria
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: '#TIMEKIZOEIRA',
+                                text: 'Minha foto personalizada!'
+                            });
+                            return;
+                        } catch (err) {
+                            if (err.name === 'AbortError') return;
+                        }
+                    }
+
+                    // No Notebook: Download direto do arquivo
+                    const blobUrl = URL.createObjectURL(blob);
                     const link = document.createElement('a');
-                    link.download = 'foto-kizoeira.png';
-                    link.href = dataUrl;
+                    link.download = fileName;
+                    link.href = blobUrl;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                } catch (err) {
-                    alert('Pressione e segure na foto para salvar!');
-                }
+
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+                }, 'image/png');
             });
         });
     </script>
