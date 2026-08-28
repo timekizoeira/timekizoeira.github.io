@@ -54,6 +54,35 @@
             margin: 10px 0;
         }
 
+        .controls-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 10px 5px;
+            background: #ffffff;
+            color: #006028;
+            font-weight: bold;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            border: 2px solid #006028;
+            cursor: pointer;
+            text-align: center;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-small:disabled {
+            background: #cccccc;
+            color: #666666;
+            border-color: #999999;
+            cursor: not-allowed;
+        }
+
         .btn, label.btn {
             display: block;
             width: 100%;
@@ -109,7 +138,7 @@
             position: relative;
             width: 280px;
             height: 280px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             border: 2px solid #ffffff;
             border-radius: 8px;
             overflow: hidden;
@@ -161,8 +190,15 @@
         <div class="preview-area">
             <canvas id="canvas"></canvas>
         </div>
+
+        <!-- Ferramentas de Giro e Zoom -->
+        <div class="controls-row">
+            <button id="rotateBtn" class="btn-small" disabled onclick="rotateImage()">🔄 GIRAR 90°</button>
+            <button id="zoomInBtn" class="btn-small" disabled onclick="zoomImage(1.1)">🔍 + ZOOM</button>
+            <button id="zoomOutBtn" class="btn-small" disabled onclick="zoomImage(0.9)">🔍 - ZOOM</button>
+        </div>
         
-        <p class="instructions">💡 Arraste com o dedo na imagem para ajustar a posição.</p>
+        <p class="instructions">💡 Arraste com o dedo para mover a foto ao fundo.</p>
 
         <div class="actions-container">
             <button id="downloadBtn" class="btn" disabled>💾 BAIXAR FOTO PRONTA</button>
@@ -178,7 +214,11 @@
         const galleryInput = document.getElementById('galleryInput');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+        
         const downloadBtn = document.getElementById('downloadBtn');
+        const rotateBtn = document.getElementById('rotateBtn');
+        const zoomInBtn = document.getElementById('zoomInBtn');
+        const zoomOutBtn = document.getElementById('zoomOutBtn');
 
         const moldurasSrc = [
             'moldura1.webp',
@@ -198,6 +238,8 @@
         let imgX = 0;
         let imgY = 0;
         let imgScale = 1;
+        let rotationAngle = 0; // Ângulo de rotação em graus (0, 90, 180, 270)
+
         let isDragging = false;
         let startX = 0;
         let startY = 0;
@@ -221,14 +263,20 @@
                 const img = new Image();
                 img.onload = () => {
                     userImg = img;
+                    rotationAngle = 0; // Reseta o giro para novas fotos
                     
                     const baseScale = Math.max(canvas.width / img.width, canvas.height / img.height);
                     imgScale = baseScale;
-                    imgX = (canvas.width - img.width * imgScale) / 2;
-                    imgY = (canvas.height - img.height * imgScale) / 2;
+                    imgX = canvas.width / 2;
+                    imgY = canvas.height / 2;
 
                     requestRender();
+                    
+                    // Habilita os botões de controle
                     downloadBtn.disabled = false;
+                    rotateBtn.disabled = false;
+                    zoomInBtn.disabled = false;
+                    zoomOutBtn.disabled = false;
                 };
                 img.src = e.target.result;
             };
@@ -236,6 +284,18 @@
         }
 
         galleryInput.addEventListener('change', (e) => processFile(e.target.files[0]));
+
+        function rotateImage() {
+            if (!userImg) return;
+            rotationAngle = (rotationAngle + 90) % 360;
+            requestRender();
+        }
+
+        function zoomImage(factor) {
+            if (!userImg) return;
+            imgScale *= factor;
+            requestRender();
+        }
 
         function requestRender() {
             if (!renderPending) {
@@ -248,15 +308,28 @@
             renderPending = false;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // 1. Desenha e rotaciona a imagem do usuário
             if (userImg) {
-                ctx.drawImage(userImg, imgX, imgY, userImg.width * imgScale, userImg.height * imgScale);
+                ctx.save();
+                ctx.translate(imgX, imgY);
+                ctx.rotate((rotationAngle * Math.PI) / 180);
+                ctx.drawImage(
+                    userImg,
+                    (-userImg.width * imgScale) / 2,
+                    (-userImg.height * imgScale) / 2,
+                    userImg.width * imgScale,
+                    userImg.height * imgScale
+                );
+                ctx.restore();
             }
 
+            // 2. Desenha a moldura por cima (fixa)
             if (frameImg.complete && frameImg.naturalWidth !== 0) {
                 ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
             }
         }
 
+        // --- CONTROLE DE ARRASTAR (MOVE A FOTO) ---
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
