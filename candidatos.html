@@ -8,7 +8,7 @@
     <!-- Fonte Google: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
 
     <style>
         * {
@@ -29,17 +29,15 @@
 
         .container {
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
             background-color: #ffffff;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
-        /* Botão Voltar Topo */
+        /* Barra superior para voltar */
         .back-bar {
             background-color: #006028;
             padding: 12px 15px;
-            text-align: left;
         }
 
         .back-link {
@@ -49,25 +47,25 @@
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
-        /* Card Genérico */
+        /* ESTRUTURA DOS CARDS */
         .card {
             position: relative;
             width: 100%;
-            min-height: 240px;
+            min-height: 250px;
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
             overflow: hidden;
-            padding: 20px 15px;
+            padding: 20px 18px;
             border-bottom: 2px solid #000000;
         }
 
-        /* CARD 1: GOVERNADOR - VERDE */
+        /* 1. CARD ORLEANS BRANDÃO (VERDE) */
         .card-orleans {
-            background-color: #009e49;
+            background-color: #009944;
             min-height: 260px;
         }
 
@@ -86,10 +84,8 @@
             z-index: 2;
             margin-left: auto;
             width: 55%;
-            text-align: right;
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+            justify-content: flex-end;
         }
 
         .logo-orleans {
@@ -98,10 +94,10 @@
             display: block;
         }
 
-        /* CARD 2: AMANDA GENTIL - ROXO */
+        /* 2. CARD AMANDA GENTIL (ROXO) */
         .card-amanda {
-            background-color: #671e95;
-            min-height: 240px;
+            background-color: #611b8d;
+            min-height: 250px;
         }
 
         .card-amanda .info-box {
@@ -121,10 +117,10 @@
             z-index: 1;
         }
 
-        /* CARD 3: GLEYDSON RESENDE - VERDE */
+        /* 3. CARD GLEYDSON RESENDE (VERDE) */
         .card-gleydson {
-            background-color: #009e49;
-            min-height: 260px;
+            background-color: #009944;
+            min-height: 270px;
             border-bottom: none;
         }
 
@@ -142,15 +138,14 @@
             position: relative;
             z-index: 2;
             margin-left: auto;
-            width: 58%;
+            width: 60%;
             text-align: left;
         }
 
-        /* TIPOGRAFIA POPPINS PARA NOMES E NÚMEROS */
+        /* ESTILOS DE TEXTO E TIPOGRAFIA POPPINS */
         .cargo {
             font-size: 0.85rem;
-            font-weight: 400;
-            text-transform: capitalize;
+            font-weight: 500;
             letter-spacing: 0.5px;
             display: block;
             margin-bottom: 2px;
@@ -158,17 +153,18 @@
         }
 
         .nome {
-            font-size: 1.6rem;
+            font-size: 1.65rem;
             font-weight: 800;
             line-height: 1.1;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            letter-spacing: -0.3px;
         }
 
         .numero {
-            font-size: 3.2rem;
+            font-size: 3.4rem;
             font-weight: 900;
-            line-height: 1;
-            letter-spacing: -1px;
+            line-height: 0.95;
+            letter-spacing: -1.5px;
             margin-bottom: 8px;
         }
 
@@ -176,14 +172,14 @@
             font-size: 0.75rem;
             font-weight: 600;
             line-height: 1.35;
-            margin-top: 5px;
+            margin-top: 6px;
         }
 
         .detalhes p {
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
 
-        /* Rodapé */
+        /* RODAPÉ */
         footer {
             width: 100%;
             background-color: #2EC254;
@@ -193,7 +189,7 @@
 
         footer p {
             font-family: 'Poppins', sans-serif;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1.2rem;
             letter-spacing: 1px;
         }
@@ -202,39 +198,32 @@
 <body>
 
     <div class="container">
-        <!-- Barra de Voltar -->
+        <!-- Botão Voltar -->
         <div class="back-bar">
             <a href="index.html" class="back-link">← Voltar para o início</a>
         </div>
 
-        <!-- 1. ORLEANS BRANDÃO (GOVERNADOR) -->
+        <!-- 1. GOVERNADOR ORLEANS BRANDÃO -->
         <div class="card card-orleans">
-            <!-- Foto em PNG de Orleans Brandão -->
             <img src="orleans.png" alt="Orleans Brandão" class="candidate-img">
-            
             <div class="info-box">
-                <!-- Logomarca em PNG de Orleans Brandão -->
-                <img src="logo-orleans.png" alt="Orleans Brandão 15" class="logo-orleans">
+                <img src="logo-orleans.png" alt="Orleans Brandão 15 - Vice Edivaldo Holanda Jr." class="logo-orleans">
             </div>
         </div>
 
-        <!-- 2. AMANDA GENTIL (DEPUTADA FEDERAL) -->
+        <!-- 2. DEPUTADA FEDERAL AMANDA GENTIL -->
         <div class="card card-amanda">
             <div class="info-box">
                 <span class="cargo">Deputada Federal</span>
                 <h2 class="nome">Amanda Gentil</h2>
                 <div class="numero">11 11</div>
             </div>
-            
-            <!-- Foto em PNG de Amanda Gentil -->
             <img src="amanda.png" alt="Amanda Gentil" class="candidate-img">
         </div>
 
-        <!-- 3. GLEYDSON RESENDE (DEPUTADO ESTADUAL) -->
+        <!-- 3. DEPUTADO ESTADUAL GLEYDSON RESENDE -->
         <div class="card card-gleydson">
-            <!-- Foto em PNG de Gleydson Resende -->
             <img src="gleydson.png" alt="Gleydson Resende" class="candidate-img">
-
             <div class="info-box">
                 <span class="cargo">Deputado Estadual</span>
                 <h2 class="nome">Gleydson Resende</h2>
@@ -247,6 +236,7 @@
             </div>
         </div>
 
+        <!-- RODAPÉ -->
         <footer>
             <p>#TIMEKIZOEIRA</p>
         </footer>
