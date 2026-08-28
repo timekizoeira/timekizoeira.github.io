@@ -238,7 +238,7 @@
         let imgX = 0;
         let imgY = 0;
         let imgScale = 1;
-        let rotationAngle = 0; // Ângulo de rotação em graus (0, 90, 180, 270)
+        let rotationAngle = 0;
 
         let isDragging = false;
         let startX = 0;
@@ -256,31 +256,69 @@
             frameImg.onload = () => requestRender();
         }
 
+        // Processa a foto otimizando o uso de RAM para não travar o celular
         function processFile(file) {
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    userImg = img;
-                    rotationAngle = 0; // Reseta o giro para novas fotos
-                    
-                    const baseScale = Math.max(canvas.width / img.width, canvas.height / img.height);
-                    imgScale = baseScale;
-                    imgX = canvas.width / 2;
-                    imgY = canvas.height / 2;
 
-                    requestRender();
-                    
-                    // Habilita os botões de controle
-                    downloadBtn.disabled = false;
-                    rotateBtn.disabled = false;
-                    zoomInBtn.disabled = false;
-                    zoomOutBtn.disabled = false;
-                };
-                img.src = e.target.result;
+            const objectUrl = URL.createObjectURL(file);
+            const tempImg = new Image();
+
+            tempImg.onload = () => {
+                // Limite de resolução máxima (1200px) para evitar travamentos de memória
+                const maxDim = 1200;
+                let width = tempImg.width;
+                let height = tempImg.height;
+
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+
+                    // Redimensiona em tela invisível antes de carregar
+                    const offCanvas = document.createElement('canvas');
+                    offCanvas.width = width;
+                    offCanvas.height = height;
+                    const offCtx = offCanvas.getContext('2d');
+                    offCtx.drawImage(tempImg, 0, 0, width, height);
+
+                    const scaledImg = new Image();
+                    scaledImg.onload = () => {
+                        userImg = scaledImg;
+                        setupNewImage();
+                        URL.revokeObjectURL(objectUrl);
+                    };
+                    scaledImg.src = offCanvas.toDataURL('image/jpeg', 0.85);
+                } else {
+                    userImg = tempImg;
+                    setupNewImage();
+                    URL.revokeObjectURL(objectUrl);
+                }
             };
-            reader.readAsDataURL(file);
+
+            tempImg.onerror = () => {
+                URL.revokeObjectURL(objectUrl);
+            };
+
+            tempImg.src = objectUrl;
+        }
+
+        function setupNewImage() {
+            rotationAngle = 0;
+            const baseScale = Math.max(canvas.width / userImg.width, canvas.height / userImg.height);
+            imgScale = baseScale;
+            imgX = canvas.width / 2;
+            imgY = canvas.height / 2;
+
+            requestRender();
+
+            downloadBtn.disabled = false;
+            rotateBtn.disabled = false;
+            zoomInBtn.disabled = false;
+            zoomOutBtn.disabled = false;
         }
 
         galleryInput.addEventListener('change', (e) => processFile(e.target.files[0]));
@@ -308,7 +346,6 @@
             renderPending = false;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Desenha e rotaciona a imagem do usuário
             if (userImg) {
                 ctx.save();
                 ctx.translate(imgX, imgY);
@@ -323,13 +360,12 @@
                 ctx.restore();
             }
 
-            // 2. Desenha a moldura por cima (fixa)
             if (frameImg.complete && frameImg.naturalWidth !== 0) {
                 ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
             }
         }
 
-        // --- CONTROLE DE ARRASTAR (MOVE A FOTO) ---
+        // --- CONTROLE DE ARRASTAR (TOQUE E MOUSE) ---
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -350,6 +386,7 @@
 
         function handleMove(e) {
             if (!isDragging || !userImg) return;
+            if (e.cancelable) e.preventDefault(); // Evita rolar a página no iPhone ao arrastar
             const pos = getPos(e);
             imgX = pos.x - startX;
             imgY = pos.y - startY;
@@ -365,7 +402,7 @@
         window.addEventListener('mouseup', handleEnd);
 
         canvas.addEventListener('touchstart', handleStart, { passive: true });
-        canvas.addEventListener('touchmove', handleMove, { passive: true });
+        canvas.addEventListener('touchmove', handleMove, { passive: false });
         canvas.addEventListener('touchend', handleEnd);
 
         downloadBtn.addEventListener('click', () => {
