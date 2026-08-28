@@ -50,30 +50,30 @@
             gap: 6px;
         }
 
-        /* ESTRUTURA DOS CARDS */
+        /* ESTRUTURA BASE DOS CARDS */
         .card {
             position: relative;
             width: 100%;
             min-height: 250px;
             display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
             overflow: hidden;
             padding: 20px 18px;
             border-bottom: 2px solid #000000;
         }
 
-        /* 1. CARD ORLEANS BRANDÃO (VERDE) */
+        /* 1. CARD ORLEANS BRANDÃO (VERDE) - Alinhado ao topo para subir a logo */
         .card-orleans {
             background-color: #009944;
             min-height: 260px;
+            align-items: flex-start; /* Subiu a logo para o topo direito */
+            justify-content: flex-end;
         }
 
         .card-orleans .candidate-img {
             position: absolute;
             left: 0;
             bottom: 0;
-            height: 95%;
+            height: 100%;
             width: auto;
             object-fit: contain;
             z-index: 1;
@@ -82,10 +82,10 @@
         .card-orleans .info-box {
             position: relative;
             z-index: 2;
-            margin-left: auto;
             width: 55%;
             display: flex;
             justify-content: flex-end;
+            padding-top: 5px; /* Ajuste para afastar do topo */
         }
 
         .logo-orleans {
@@ -94,10 +94,11 @@
             display: block;
         }
 
-        /* 2. CARD AMANDA GENTIL (ROXO) */
+        /* 2. CARD AMANDA GENTIL (ROXO) - Centralizado verticalmente */
         .card-amanda {
             background-color: #611b8d;
             min-height: 250px;
+            align-items: center; /* Alinha o texto exatamente no meio da faixa roxa */
         }
 
         .card-amanda .info-box {
@@ -105,13 +106,14 @@
             z-index: 2;
             width: 55%;
             text-align: left;
+            padding-left: 5px;
         }
 
         .card-amanda .candidate-img {
             position: absolute;
             right: 0;
             bottom: 0;
-            height: 95%;
+            height: 100%;
             width: auto;
             object-fit: contain;
             z-index: 1;
@@ -121,6 +123,7 @@
         .card-gleydson {
             background-color: #009944;
             min-height: 270px;
+            align-items: center;
             border-bottom: none;
         }
 
@@ -128,7 +131,7 @@
             position: absolute;
             left: 0;
             bottom: 0;
-            height: 95%;
+            height: 100%;
             width: auto;
             object-fit: contain;
             z-index: 1;
@@ -138,7 +141,7 @@
             position: relative;
             z-index: 2;
             margin-left: auto;
-            width: 60%;
+            width: 58%;
             text-align: left;
         }
 
