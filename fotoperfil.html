@@ -132,3 +132,286 @@
             width: 280px;
             height: 280px;
             margin-bottom: 10px;
+            border: 2px solid #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000000;
+            touch-action: none;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: move;
+            touch-action: none;
+        }
+
+        .instructions {
+            font-size: 0.75rem;
+            margin-bottom: 10px;
+            color: #d4ffd9;
+        }
+
+        footer {
+            width: 100%;
+            background-color: #2EC254;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>PERSONALIZAR FOTO</h1>
+
+        <p style="font-size:0.85rem; margin-bottom:8px;">Escolha a moldura:</p>
+        <div class="molduras-grid">
+            <img src="moldura1.webp" class="moldura-thumb active" data-index="0" alt="1">
+            <img src="moldura2.webp" class="moldura-thumb" data-index="1" alt="2">
+            <img src="moldura3.webp" class="moldura-thumb" data-index="2" alt="3">
+            <img src="moldura4.webp" class="moldura-thumb" data-index="4" alt="4">
+            <img src="moldura5.webp" class="moldura-thumb" data-index="4" alt="5">
+        </div>
+
+        <div class="actions-container">
+            <label for="galleryInput" class="btn">📁 CARREGAR FOTO</label>
+            <input type="file" id="galleryInput" accept="image/*">
+        </div>
+
+        <div class="preview-area">
+            <canvas id="canvas" width="400" height="400"></canvas>
+        </div>
+
+        <div class="controls-row">
+            <button id="rotateBtn" class="btn-small" disabled>🔄 GIRAR 90°</button>
+            <button id="zoomInBtn" class="btn-small" disabled>🔍 + ZOOM</button>
+            <button id="zoomOutBtn" class="btn-small" disabled>🔍 - ZOOM</button>
+        </div>
+        
+        <p class="instructions">💡 Arraste com o dedo para mover a foto ao fundo.</p>
+
+        <div class="actions-container">
+            <button id="downloadBtn" class="btn" disabled>💾 BAIXAR FOTO PRONTA</button>
+            <a href="index.html" class="btn">⬅️ VOLTAR</a>
+        </div>
+    </div>
+
+    <footer>
+        <p style="font-weight:bold;">#TIMEKIZOEIRA</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const galleryInput = document.getElementById('galleryInput');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const rotateBtn = document.getElementById('rotateBtn');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const molduraThumbs = document.querySelectorAll('.moldura-thumb');
+
+            const moldurasSrc = [
+                'moldura1.webp',
+                'moldura2.webp',
+                'moldura3.webp',
+                'moldura4.webp',
+                'moldura5.webp'
+            ];
+
+            let selectedIndex = 0;
+            let userImg = null;
+            let frameImg = new Image();
+
+            let imgX = 200;
+            let imgY = 200;
+            let imgScale = 1;
+            let rotationAngle = 0;
+
+            let isDragging = false;
+            let startX = 0;
+            let startY = 0;
+            let renderPending = false;
+
+            // Carrega a primeira moldura
+            frameImg.onload = requestRender;
+            frameImg.src = moldurasSrc[0];
+
+            // Clique nas miniaturas das molduras
+            molduraThumbs.forEach((thumb, idx) => {
+                thumb.addEventListener('click', () => {
+                    molduraThumbs.forEach(t => t.classList.remove('active'));
+                    thumb.classList.add('active');
+                    selectedIndex = idx;
+                    frameImg = new Image();
+                    frameImg.onload = requestRender;
+                    frameImg.src = moldurasSrc[selectedIndex];
+                });
+            });
+
+            // Otimização inteligente da foto carregada (evita estouro de memória no iPhone)
+            galleryInput.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+
+                const tempUrl = URL.createObjectURL(file);
+                const tempImg = new Image();
+
+                tempImg.onload = () => {
+                    // Limite leve de no máximo 1000px
+                    const maxDim = 1000;
+                    let w = tempImg.naturalWidth;
+                    let h = tempImg.naturalHeight;
+
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) {
+                            h = Math.round((h * maxDim) / w);
+                            w = maxDim;
+                        } else {
+                            w = Math.round((w * maxDim) / h);
+                            h = maxDim;
+                        }
+                    }
+
+                    // Redimensiona numa tela leve em segundo plano
+                    const offCanvas = document.createElement('canvas');
+                    offCanvas.width = w;
+                    offCanvas.height = h;
+                    const offCtx = offCanvas.getContext('2d');
+                    offCtx.drawImage(tempImg, 0, 0, w, h);
+
+                    URL.revokeObjectURL(tempUrl);
+
+                    const optimizedImg = new Image();
+                    optimizedImg.onload = () => {
+                        userImg = optimizedImg;
+                        rotationAngle = 0;
+                        imgScale = Math.max(400 / w, 400 / h);
+                        imgX = 200;
+                        imgY = 200;
+
+                        requestRender();
+
+                        downloadBtn.disabled = false;
+                        rotateBtn.disabled = false;
+                        zoomInBtn.disabled = false;
+                        zoomOutBtn.disabled = false;
+                    };
+                    optimizedImg.src = offCanvas.toDataURL('image/jpeg', 0.85);
+                };
+
+                tempImg.src = tempUrl;
+            });
+
+            rotateBtn.addEventListener('click', () => {
+                if (!userImg) return;
+                rotationAngle = (rotationAngle + 90) % 360;
+                requestRender();
+            });
+
+            zoomInBtn.addEventListener('click', () => {
+                if (!userImg) return;
+                imgScale *= 1.1;
+                requestRender();
+            });
+
+            zoomOutBtn.addEventListener('click', () => {
+                if (!userImg) return;
+                imgScale *= 0.9;
+                requestRender();
+            });
+
+            function requestRender() {
+                if (!renderPending) {
+                    renderPending = true;
+                    requestAnimationFrame(render);
+                }
+            }
+
+            function render() {
+                renderPending = false;
+                
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, 400, 400);
+
+                if (userImg) {
+                    const w = userImg.naturalWidth || userImg.width;
+                    const h = userImg.naturalHeight || userImg.height;
+                    
+                    ctx.save();
+                    ctx.translate(imgX, imgY);
+                    ctx.rotate((rotationAngle * Math.PI) / 180);
+                    ctx.drawImage(
+                        userImg,
+                        (-w * imgScale) / 2,
+                        (-h * imgScale) / 2,
+                        w * imgScale,
+                        h * imgScale
+                    );
+                    ctx.restore();
+                }
+
+                if (frameImg.complete && frameImg.naturalWidth > 0) {
+                    ctx.drawImage(frameImg, 0, 0, 400, 400);
+                }
+            }
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches ? e.touches[0] : e;
+                return {
+                    x: (touch.clientX - rect.left) * (400 / rect.width),
+                    y: (touch.clientY - rect.top) * (400 / rect.height)
+                };
+            }
+
+            function handleStart(e) {
+                if (!userImg) return;
+                isDragging = true;
+                const pos = getPos(e);
+                startX = pos.x - imgX;
+                startY = pos.y - imgY;
+            }
+
+            function handleMove(e) {
+                if (!isDragging) return;
+                if (e.cancelable) e.preventDefault();
+                const pos = getPos(e);
+                imgX = pos.x - startX;
+                imgY = pos.y - startY;
+                requestRender();
+            }
+
+            function handleEnd() {
+                isDragging = false;
+            }
+
+            canvas.addEventListener('mousedown', handleStart);
+            canvas.addEventListener('mousemove', handleMove);
+            window.addEventListener('mouseup', handleEnd);
+
+            canvas.addEventListener('touchstart', handleStart, { passive: true });
+            canvas.addEventListener('touchmove', handleMove, { passive: false });
+            canvas.addEventListener('touchend', handleEnd);
+
+            downloadBtn.addEventListener('click', () => {
+                try {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = 'foto-kizoeira.png';
+                    link.href = dataUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (err) {
+                    alert('Pressione e segure na foto para salvar!');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
