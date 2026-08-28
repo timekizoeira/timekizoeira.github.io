@@ -97,7 +97,7 @@
         /* 2. CARD AMANDA GENTIL (ROXO) */
         .card-amanda {
             background-color: #611b8d;
-            min-height: 250px;
+            min-height: 260px;
             align-items: center;
         }
 
@@ -170,6 +170,33 @@
             letter-spacing: -1.5px;
         }
 
+        /* BOTÃO INSTAGRAM COM CHECK VERIFICADO */
+        .insta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 5px 12px;
+            border-radius: 20px;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        .insta-btn:hover, .insta-btn:active {
+            background: rgba(0, 0, 0, 0.4);
+            transform: scale(1.03);
+        }
+
+        .verified-badge {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+        }
+
         /* RODAPÉ */
         footer {
             width: 100%;
@@ -208,6 +235,14 @@
                 <span class="cargo">Deputada Federal</span>
                 <h2 class="nome">Amanda Gentil</h2>
                 <div class="numero">11 11</div>
+                
+                <!-- BOTÃO DO INSTAGRAM DA AMANDA GENTIL -->
+                <a href="https://www.instagram.com/amandagentill/" target="_blank" class="insta-btn">
+                    amandagentill
+                    <svg class="verified-badge" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#0095F6"/>
+                    </svg>
+                </a>
             </div>
             <img src="amanda.png" alt="Amanda Gentil" class="candidate-img">
         </div>
