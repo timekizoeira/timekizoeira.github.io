@@ -64,7 +64,7 @@
         /* 1. CARD ORLEANS BRANDÃO (VERDE) */
         .card-orleans {
             background-color: #009944;
-            min-height: 260px;
+            min-height: 270px;
             align-items: flex-start;
             justify-content: flex-end;
         }
@@ -84,7 +84,8 @@
             z-index: 2;
             width: 55%;
             display: flex;
-            justify-content: flex-end;
+            flex-direction: column;
+            align-items: flex-end;
             padding-top: 5px;
         }
 
@@ -122,7 +123,7 @@
         /* 3. CARD GLEYDSON RESENDE (VERDE) */
         .card-gleydson {
             background-color: #009944;
-            min-height: 250px;
+            min-height: 270px;
             align-items: center;
             border-bottom: none;
         }
@@ -170,6 +171,16 @@
             letter-spacing: -1.5px;
         }
 
+        /* LEGENDA PEQUENA ACIMA DO BOTÃO */
+        .insta-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.85);
+            display: block;
+            margin-bottom: 2px;
+            letter-spacing: 0.3px;
+        }
+
         /* BOTÃO INSTAGRAM COM CHECK VERIFICADO */
         .insta-btn {
             display: inline-flex;
@@ -179,7 +190,6 @@
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 700;
-            margin-top: 10px;
             background: rgba(0, 0, 0, 0.25);
             padding: 5px 12px;
             border-radius: 20px;
@@ -226,6 +236,15 @@
             <img src="orleans.png" alt="Orleans Brandão" class="candidate-img">
             <div class="info-box">
                 <img src="logo-orleans.png" alt="Orleans Brandão 15 - Vice Edivaldo Holanda Jr." class="logo-orleans">
+                
+                <!-- INSTAGRAM ORLEANS BRANDÃO -->
+                <span class="insta-label" style="margin-top: 10px;">Seguir no Instagram</span>
+                <a href="https://www.instagram.com/orleansbrandaoma/" target="_blank" class="insta-btn">
+                    orleansbrandaoma
+                    <svg class="verified-badge" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#0095F6"/>
+                    </svg>
+                </a>
             </div>
         </div>
 
@@ -236,7 +255,8 @@
                 <h2 class="nome">Amanda Gentil</h2>
                 <div class="numero">11 11</div>
                 
-                <!-- BOTÃO DO INSTAGRAM DA AMANDA GENTIL -->
+                <!-- INSTAGRAM AMANDA GENTIL -->
+                <span class="insta-label" style="margin-top: 8px;">Seguir no Instagram</span>
                 <a href="https://www.instagram.com/amandagentill/" target="_blank" class="insta-btn">
                     amandagentill
                     <svg class="verified-badge" viewBox="0 0 24 24" fill="none">
@@ -251,6 +271,15 @@
         <div class="card card-gleydson">
             <img src="gleydson.png" alt="Gleydson Resende" class="candidate-img">
             <div class="info-box">
+                <!-- INSTAGRAM GLEYDSON RESENDE -->
+                <span class="insta-label">Seguir no Instagram</span>
+                <a href="https://www.instagram.com/gleydsonresende/" target="_blank" class="insta-btn" style="margin-bottom: 8px;">
+                    gleydsonresende
+                    <svg class="verified-badge" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#0095F6"/>
+                    </svg>
+                </a>
+
                 <span class="cargo">Deputado Estadual</span>
                 <h2 class="nome">Gleydson Resende</h2>
                 <div class="numero">15700</div>
