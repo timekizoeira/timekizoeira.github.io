@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>Personalizar Foto - #TIMEKIZOEIRA!</title>
+    <title>Teste Sem Molduras - #TIMEKIZOEIRA!</title>
     
     <script>
         if (window.location.protocol === 'http:') {
@@ -42,7 +42,7 @@
 
         h1 {
             font-size: 1.3rem;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             text-transform: uppercase;
         }
 
@@ -111,29 +111,6 @@
             display: none !important;
         }
 
-        .molduras-grid {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 12px;
-            width: 100%;
-        }
-
-        .moldura-thumb {
-            width: 50px;
-            height: 50px;
-            border: 2px solid #ffffff;
-            border-radius: 6px;
-            cursor: pointer;
-            object-fit: contain;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .moldura-thumb.active {
-            border: 3px solid #2EC254;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
         .preview-area {
             position: relative;
             width: 280px;
@@ -168,7 +145,6 @@
             justify-content: center;
         }
 
-        /* Oculta os elementos estáticos de apoio da memória RAM */
         .static-assets {
             display: none !important;
         }
@@ -176,27 +152,13 @@
 </head>
 <body>
 
-    <!-- Molduras e Imagem do usuário carregadas estaticamente para consumo ZERO de JS RAM -->
+    <!-- Apenas a imagem do usuário ficará na memória (sem molduras) -->
     <div class="static-assets">
-        <img id="m0" src="moldura1.webp" onload="requestRender()">
-        <img id="m1" src="moldura2.webp">
-        <img id="m2" src="moldura3.webp">
-        <img id="m3" src="moldura4.webp">
-        <img id="m4" src="moldura5.webp">
         <img id="userImgEl">
     </div>
 
     <div class="container">
-        <h1>PERSONALIZAR FOTO</h1>
-
-        <p style="font-size:0.85rem; margin-bottom:8px;">Escolha a moldura:</p>
-        <div class="molduras-grid">
-            <img src="moldura1.webp" class="moldura-thumb active" onclick="selectMoldura(0, this)" alt="1">
-            <img src="moldura2.webp" class="moldura-thumb" onclick="selectMoldura(1, this)" alt="2">
-            <img src="moldura3.webp" class="moldura-thumb" onclick="selectMoldura(2, this)" alt="3">
-            <img src="moldura4.webp" class="moldura-thumb" onclick="selectMoldura(3, this)" alt="4">
-            <img src="moldura5.webp" class="moldura-thumb" onclick="selectMoldura(4, this)" alt="5">
-        </div>
+        <h1>TESTE SEM MOLDURAS</h1>
 
         <div class="actions-container">
             <label for="galleryInput" class="btn">📁 CARREGAR FOTO</label>
@@ -236,15 +198,7 @@
         const zoomOutBtn = document.getElementById('zoomOutBtn');
 
         const userImgEl = document.getElementById('userImgEl');
-        const moldurasEls = [
-            document.getElementById('m0'),
-            document.getElementById('m1'),
-            document.getElementById('m2'),
-            document.getElementById('m3'),
-            document.getElementById('m4')
-        ];
 
-        let selectedMolduraIndex = 0;
         let currentBlobUrl = null;
 
         let imgX = 200;
@@ -257,19 +211,11 @@
         let startY = 0;
         let renderPending = false;
 
-        function selectMoldura(index, element) {
-            document.querySelectorAll('.moldura-thumb').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-            selectedMolduraIndex = index;
-            requestRender();
-        }
-
-        // Carregamento limpo sem uso de Base64
+        // Carregamento da imagem do usuário
         galleryInput.addEventListener('change', (e) => {
             const file = e.target.files && e.target.files[0];
             if (!file) return;
 
-            // Apaga imediatamente a imagem anterior da memória RAM do celular
             if (currentBlobUrl) {
                 URL.revokeObjectURL(currentBlobUrl);
             }
@@ -323,7 +269,7 @@
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, 400, 400);
 
-            // 1. Desenha a foto do usuário
+            // Desenha apenas a foto do usuário
             if (userImgEl.complete && userImgEl.naturalWidth > 0) {
                 const w = userImgEl.naturalWidth;
                 const h = userImgEl.naturalHeight;
@@ -340,15 +286,9 @@
                 );
                 ctx.restore();
             }
-
-            // 2. Desenha a moldura estática
-            const activeFrame = moldurasEls[selectedMolduraIndex];
-            if (activeFrame && activeFrame.complete && activeFrame.naturalWidth > 0) {
-                ctx.drawImage(activeFrame, 0, 0, 400, 400);
-            }
         }
 
-        // --- ARRASTAR MOUSE E TOQUE LEVE PARA iOS ---
+        // --- ARRASTAR MOUSE E TOQUE LEVE ---
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
             const touch = e.touches ? e.touches[0] : e;
