@@ -169,15 +169,20 @@
 
         <p style="font-size:0.85rem; margin-bottom:8px;">Escolha a moldura:</p>
         <div class="molduras-grid">
-            <img src="moldura1.webp" class="moldura-thumb active" data-index="0" alt="1">
-            <img src="moldura2.webp" class="moldura-thumb" data-index="1" alt="2">
-            <img src="moldura3.webp" class="moldura-thumb" data-index="2" alt="3">
-            <img src="moldura4.webp" class="moldura-thumb" data-index="4" alt="4">
-            <img src="moldura5.webp" class="moldura-thumb" data-index="4" alt="5">
+            <img src="moldura1.webp" class="moldura-thumb active" alt="1">
+            <img src="moldura2.webp" class="moldura-thumb" alt="2">
+            <img src="moldura3.webp" class="moldura-thumb" alt="3">
+            <img src="moldura4.webp" class="moldura-thumb" alt="4">
+            <img src="moldura5.webp" class="moldura-thumb" alt="5">
         </div>
 
         <div class="actions-container">
-            <label for="galleryInput" class="btn">📁 CARREGAR FOTO</label>
+            <!-- Botão de Câmera Direta -->
+            <label for="cameraInput" class="btn">📷 TIRAR FOTO (CÂMERA)</label>
+            <input type="file" id="cameraInput" accept="image/*" capture="user">
+
+            <!-- Botão de Galeria de Fotos -->
+            <label for="galleryInput" class="btn">📁 CARREGAR DA GALERIA</label>
             <input type="file" id="galleryInput" accept="image/*">
         </div>
 
@@ -209,6 +214,7 @@
             const ctx = canvas.getContext('2d');
             
             const galleryInput = document.getElementById('galleryInput');
+            const cameraInput = document.getElementById('cameraInput');
             const downloadBtn = document.getElementById('downloadBtn');
             const rotateBtn = document.getElementById('rotateBtn');
             const zoomInBtn = document.getElementById('zoomInBtn');
@@ -237,11 +243,9 @@
             let startY = 0;
             let renderPending = false;
 
-            // Carrega a primeira moldura
             frameImg.onload = requestRender;
             frameImg.src = moldurasSrc[0];
 
-            // Clique nas miniaturas das molduras
             molduraThumbs.forEach((thumb, idx) => {
                 thumb.addEventListener('click', () => {
                     molduraThumbs.forEach(t => t.classList.remove('active'));
@@ -253,16 +257,14 @@
                 });
             });
 
-            // Otimização inteligente da foto carregada (evita estouro de memória no iPhone)
-            galleryInput.addEventListener('change', (e) => {
-                const file = e.target.files && e.target.files[0];
+            // Função única de processamento leve de imagem para Câmera e Galeria
+            function processImageFile(file) {
                 if (!file) return;
 
                 const tempUrl = URL.createObjectURL(file);
                 const tempImg = new Image();
 
                 tempImg.onload = () => {
-                    // Limite leve de no máximo 1000px
                     const maxDim = 1000;
                     let w = tempImg.naturalWidth;
                     let h = tempImg.naturalHeight;
@@ -277,7 +279,6 @@
                         }
                     }
 
-                    // Redimensiona numa tela leve em segundo plano
                     const offCanvas = document.createElement('canvas');
                     offCanvas.width = w;
                     offCanvas.height = h;
@@ -305,7 +306,10 @@
                 };
 
                 tempImg.src = tempUrl;
-            });
+            }
+
+            galleryInput.addEventListener('change', (e) => processImageFile(e.target.files[0]));
+            cameraInput.addEventListener('change', (e) => processImageFile(e.target.files[0]));
 
             rotateBtn.addEventListener('click', () => {
                 if (!userImg) return;
