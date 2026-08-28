@@ -151,6 +151,7 @@
             height: 100%;
             display: block;
             cursor: move;
+            touch-action: none;
         }
 
         .instructions {
@@ -166,9 +167,24 @@
             display: flex;
             justify-content: center;
         }
+
+        /* Oculta os elementos estáticos de apoio da memória RAM */
+        .static-assets {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Molduras e Imagem do usuário carregadas estaticamente para consumo ZERO de JS RAM -->
+    <div class="static-assets">
+        <img id="m0" src="moldura1.webp" onload="requestRender()">
+        <img id="m1" src="moldura2.webp">
+        <img id="m2" src="moldura3.webp">
+        <img id="m3" src="moldura4.webp">
+        <img id="m4" src="moldura5.webp">
+        <img id="userImgEl">
+    </div>
 
     <div class="container">
         <h1>PERSONALIZAR FOTO</h1>
@@ -188,10 +204,9 @@
         </div>
 
         <div class="preview-area">
-            <canvas id="canvas"></canvas>
+            <canvas id="canvas" width="400" height="400"></canvas>
         </div>
 
-        <!-- Ferramentas de Giro e Zoom -->
         <div class="controls-row">
             <button id="rotateBtn" class="btn-small" disabled onclick="rotateImage()">🔄 GIRAR 90°</button>
             <button id="zoomInBtn" class="btn-small" disabled onclick="zoomImage(1.1)">🔍 + ZOOM</button>
@@ -211,32 +226,29 @@
     </footer>
 
     <script>
-        const galleryInput = document.getElementById('galleryInput');
         const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false });
         
+        const galleryInput = document.getElementById('galleryInput');
         const downloadBtn = document.getElementById('downloadBtn');
         const rotateBtn = document.getElementById('rotateBtn');
         const zoomInBtn = document.getElementById('zoomInBtn');
         const zoomOutBtn = document.getElementById('zoomOutBtn');
 
-        const moldurasSrc = [
-            'moldura1.webp',
-            'moldura2.webp',
-            'moldura3.webp',
-            'moldura4.webp',
-            'moldura5.webp'
+        const userImgEl = document.getElementById('userImgEl');
+        const moldurasEls = [
+            document.getElementById('m0'),
+            document.getElementById('m1'),
+            document.getElementById('m2'),
+            document.getElementById('m3'),
+            document.getElementById('m4')
         ];
 
         let selectedMolduraIndex = 0;
-        let userImg = null;
-        let frameImg = new Image();
+        let currentBlobUrl = null;
 
-        canvas.width = 400;
-        canvas.height = 400;
-
-        let imgX = 0;
-        let imgY = 0;
+        let imgX = 200;
+        let imgY = 200;
         let imgScale = 1;
         let rotationAngle = 0;
 
@@ -245,92 +257,54 @@
         let startY = 0;
         let renderPending = false;
 
-        frameImg.src = moldurasSrc[0];
-        frameImg.onload = () => requestRender();
-
         function selectMoldura(index, element) {
             document.querySelectorAll('.moldura-thumb').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
             selectedMolduraIndex = index;
-            frameImg.src = moldurasSrc[index];
-            frameImg.onload = () => requestRender();
+            requestRender();
         }
 
-        // Processa a foto otimizando o uso de RAM para não travar o celular
-        function processFile(file) {
+        // Carregamento limpo sem uso de Base64
+        galleryInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
             if (!file) return;
 
-            const objectUrl = URL.createObjectURL(file);
-            const tempImg = new Image();
+            // Apaga imediatamente a imagem anterior da memória RAM do celular
+            if (currentBlobUrl) {
+                URL.revokeObjectURL(currentBlobUrl);
+            }
 
-            tempImg.onload = () => {
-                // Limite de resolução máxima (1200px) para evitar travamentos de memória
-                const maxDim = 1200;
-                let width = tempImg.width;
-                let height = tempImg.height;
+            currentBlobUrl = URL.createObjectURL(file);
+            
+            userImgEl.onload = () => {
+                rotationAngle = 0;
+                const w = userImgEl.naturalWidth || 400;
+                const h = userImgEl.naturalHeight || 400;
 
-                if (width > maxDim || height > maxDim) {
-                    if (width > height) {
-                        height = Math.round((height * maxDim) / width);
-                        width = maxDim;
-                    } else {
-                        width = Math.round((width * maxDim) / height);
-                        height = maxDim;
-                    }
+                const baseScale = Math.max(400 / w, 400 / h);
+                imgScale = baseScale;
+                imgX = 200;
+                imgY = 200;
 
-                    // Redimensiona em tela invisível antes de carregar
-                    const offCanvas = document.createElement('canvas');
-                    offCanvas.width = width;
-                    offCanvas.height = height;
-                    const offCtx = offCanvas.getContext('2d');
-                    offCtx.drawImage(tempImg, 0, 0, width, height);
+                requestRender();
 
-                    const scaledImg = new Image();
-                    scaledImg.onload = () => {
-                        userImg = scaledImg;
-                        setupNewImage();
-                        URL.revokeObjectURL(objectUrl);
-                    };
-                    scaledImg.src = offCanvas.toDataURL('image/jpeg', 0.85);
-                } else {
-                    userImg = tempImg;
-                    setupNewImage();
-                    URL.revokeObjectURL(objectUrl);
-                }
+                downloadBtn.disabled = false;
+                rotateBtn.disabled = false;
+                zoomInBtn.disabled = false;
+                zoomOutBtn.disabled = false;
             };
 
-            tempImg.onerror = () => {
-                URL.revokeObjectURL(objectUrl);
-            };
-
-            tempImg.src = objectUrl;
-        }
-
-        function setupNewImage() {
-            rotationAngle = 0;
-            const baseScale = Math.max(canvas.width / userImg.width, canvas.height / userImg.height);
-            imgScale = baseScale;
-            imgX = canvas.width / 2;
-            imgY = canvas.height / 2;
-
-            requestRender();
-
-            downloadBtn.disabled = false;
-            rotateBtn.disabled = false;
-            zoomInBtn.disabled = false;
-            zoomOutBtn.disabled = false;
-        }
-
-        galleryInput.addEventListener('change', (e) => processFile(e.target.files[0]));
+            userImgEl.src = currentBlobUrl;
+        });
 
         function rotateImage() {
-            if (!userImg) return;
+            if (!userImgEl.src) return;
             rotationAngle = (rotationAngle + 90) % 360;
             requestRender();
         }
 
         function zoomImage(factor) {
-            if (!userImg) return;
+            if (!userImgEl.src) return;
             imgScale *= factor;
             requestRender();
         }
@@ -344,40 +318,48 @@
 
         function render() {
             renderPending = false;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Fundo preto fixo
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, 400, 400);
 
-            if (userImg) {
+            // 1. Desenha a foto do usuário
+            if (userImgEl.complete && userImgEl.naturalWidth > 0) {
+                const w = userImgEl.naturalWidth;
+                const h = userImgEl.naturalHeight;
+                
                 ctx.save();
                 ctx.translate(imgX, imgY);
                 ctx.rotate((rotationAngle * Math.PI) / 180);
                 ctx.drawImage(
-                    userImg,
-                    (-userImg.width * imgScale) / 2,
-                    (-userImg.height * imgScale) / 2,
-                    userImg.width * imgScale,
-                    userImg.height * imgScale
+                    userImgEl,
+                    (-w * imgScale) / 2,
+                    (-h * imgScale) / 2,
+                    w * imgScale,
+                    h * imgScale
                 );
                 ctx.restore();
             }
 
-            if (frameImg.complete && frameImg.naturalWidth !== 0) {
-                ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+            // 2. Desenha a moldura estática
+            const activeFrame = moldurasEls[selectedMolduraIndex];
+            if (activeFrame && activeFrame.complete && activeFrame.naturalWidth > 0) {
+                ctx.drawImage(activeFrame, 0, 0, 400, 400);
             }
         }
 
-        // --- CONTROLE DE ARRASTAR (TOQUE E MOUSE) ---
+        // --- ARRASTAR MOUSE E TOQUE LEVE PARA iOS ---
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const touch = e.touches ? e.touches[0] : e;
             return {
-                x: (clientX - rect.left) * (canvas.width / rect.width),
-                y: (clientY - rect.top) * (canvas.height / rect.height)
+                x: (touch.clientX - rect.left) * (400 / rect.width),
+                y: (touch.clientY - rect.top) * (400 / rect.height)
             };
         }
 
         function handleStart(e) {
-            if (!userImg) return;
+            if (!userImgEl.src) return;
             isDragging = true;
             const pos = getPos(e);
             startX = pos.x - imgX;
@@ -385,8 +367,8 @@
         }
 
         function handleMove(e) {
-            if (!isDragging || !userImg) return;
-            if (e.cancelable) e.preventDefault(); // Evita rolar a página no iPhone ao arrastar
+            if (!isDragging) return;
+            if (e.cancelable) e.preventDefault();
             const pos = getPos(e);
             imgX = pos.x - startX;
             imgY = pos.y - startY;
@@ -406,10 +388,17 @@
         canvas.addEventListener('touchend', handleEnd);
 
         downloadBtn.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = 'foto-kizoeira.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            try {
+                const dataUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = 'foto-kizoeira.png';
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (err) {
+                alert('Pressione e segure na foto para salvar na galeria!');
+            }
         });
     </script>
 </body>
