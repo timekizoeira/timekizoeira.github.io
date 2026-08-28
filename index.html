@@ -1,41 +1,82 @@
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>#TIMEKIZOEIRA</title>
 
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-        // Disparo duplo para efeito de explosão
-        const count = 200;
-        const defaults = {
-            origin: { y: 0.7 },
-            colors: ['#009944', '#006028', '#2EC254', '#ffffff', '#ffd700'] // Cores verdes, amarelo e branco
-        };
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
 
-        function fire(particleRatio, opts) {
-            confetti(Object.assign({}, defaults, opts, {
-                particleCount: Math.floor(count * particleRatio)
-            }));
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
 
-        fire(0.25, {
-            spread: 26,
-            startVelocity: 55,
-        });
-        fire(0.2, {
-            spread: 60,
-        });
-        fire(0.35, {
-            spread: 100,
-            decay: 0.91,
-            scalar: 0.8
-        });
-        fire(0.1, {
-            spread: 120,
-            startVelocity: 25,
-            decay: 0.92,
-            scalar: 1.2
-        });
-        fire(0.1, {
-            spread: 120,
-            startVelocity: 45,
-        });
-    });
-</script>
+        body {
+            background-color: #004d20;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background-color: #004d20;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* LISTA DE BOTÕES */
+        .links-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .btn-link, .btn {
+            display: block;
+            width: 100%;
+            background-color: #009944;
+            color: #ffffff;
+            text-decoration: none;
+            text-align: center;
+            padding: 14px 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            border: 2px solid #006028;
+            box-shadow: 0 3px
