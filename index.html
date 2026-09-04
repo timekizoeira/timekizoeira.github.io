@@ -1,119 +1,248 @@
-/* Configurações Gerais e Fundo Escuro */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>#TIMEKIZOEIRA - Início</title>
 
-body {
-    background-color: #030d07;
-    background-image: 
-        radial-gradient(circle at 50% 20%, rgba(0, 255, 100, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 20% 80%, rgba(0, 150, 60, 0.1) 0%, transparent 40%);
-    color: #ffffff;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
+    <!-- Fonte Google: Boldonse -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Boldonse&display=swap" rel="stylesheet">
 
-.app-container {
-    width: 100%;
-    max-width: 420px; /* Simula a largura de uma tela de celular */
-    background: rgba(2, 20, 10, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 255, 100, 0.2);
-    border-radius: 30px;
-    padding: 25px 20px;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0, 255, 100, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
 
-/* Cabeçalho */
-.app-header {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
+        body {
+            background-color: #006028;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: space-between;
+            overflow-x: hidden;
+            opacity: 0;
+            animation: fadeInPage 0.4s ease forwards;
+        }
 
-.avatar-glow {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(0,255,100,0.4) 0%, transparent 70%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 0 20px rgba(0, 255, 100, 0.4);
-    border: 1px solid rgba(0, 255, 100, 0.5);
-    overflow: hidden;
-}
+        @keyframes fadeInPage {
+            to { opacity: 1; }
+        }
 
-.avatar-glow img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 30px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
 
-.app-header h1 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: #00ff66;
-    text-shadow: 0 0 10px rgba(0, 255, 100, 0.5);
-}
+        /* Animações de Entrada (Motion Principles) */
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 15px;
+            display: block;
+            transform: translateY(-20px);
+            opacity: 0;
+            animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s;
+        }
 
-.app-header p {
-    font-size: 0.85rem;
-    color: #a0c4b0;
-}
+        h1 {
+            font-family: 'Boldonse', system-ui, sans-serif;
+            font-weight: 400;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform: translateY(15px);
+            opacity: 0;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
+        }
 
-/* Menu de Botões em Cards Estilizados */
-.menu-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
+        .subtitle {
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            color: #d4ffd9;
+            transform: translateY(15px);
+            opacity: 0;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s;
+        }
 
-.menu-card {
-    background: rgba(0, 40, 20, 0.4);
-    border: 1px solid rgba(0, 255, 100, 0.25);
-    padding: 15px 20px;
-    border-radius: 14px;
-    color: #ffffff;
-    text-decoration: none;
-    text-align: center;
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
+        .links-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s;
+        }
 
-/* Efeito ao passar o mouse ou tocar */
-.menu-card:hover {
-    background: rgba(0, 255, 100, 0.15);
-    border-color: rgba(0, 255, 100, 0.8);
-    box-shadow: 0 0 15px rgba(0, 255, 100, 0.4);
-    transform: translateY(-2px);
-}
+        @keyframes slideDown {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-/* Rodapé */
-.app-footer {
-    text-align: center;
-    padding-top: 10px;
-    border-top: 1px solid rgba(0, 255, 100, 0.1);
-}
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-.app-footer h2 {
-    font-size: 1.1rem;
-    color: #00ff66;
-    opacity: 0.8;
-}
+        .btn-link, .btn {
+            display: block;
+            width: 100%;
+            padding: 14px 10px;
+            background: #ffffff;
+            color: #006028;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            border: 2px solid #006028;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            user-select: none;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-link:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-link:active, .btn:active {
+            transform: scale(0.97);
+            background-color: #f0f0f0;
+        }
+
+        footer {
+            width: 100%;
+            background-color: #2EC254;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.5s;
+        }
+
+        footer p {
+            font-family: 'Boldonse', system-ui, sans-serif;
+            font-weight: 400;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        /* Canvas invisível sobreposto para a animação */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="container">
+        <!-- Logomarca original -->
+        <img src="EMOJI MAR.png" alt="Logo" class="logo">
+
+        <h1>#TIMEKIZOEIRA</h1>
+        <p class="subtitle">Baixe os materiais e participe da nossa campanha!</p>
+
+        <!-- LISTA DE BOTÕES -->
+        <div class="links-container">
+            <a href="candidatos.html" class="btn-link">MEUS CANDIDATOS</a>
+            <a href="./fotoperfil.html" class="btn-link">PERSONALIZE SUA FOTO DO PERFIL</a>
+            <a href="https://drive.google.com/drive/folders/1wy7o5esKOH-3LmO0V4_sNF3JuceUP9IB?usp=drive_link" class="btn-link" target="_blank">GRÁFICA</a>
+            <a href="https://drive.google.com/drive/folders/1amTXV6EjdZjpBfZjUWIYoUpSARChRDG7?usp=drive_link" class="btn-link" target="_blank">CARD DE APOIO</a>
+            <a href="https://drive.google.com/drive/folders/1GyuzwAZU8ryqmyseiwhyalLZGMNO14oR?usp=drive_link" class="btn-link" target="_blank">FOTOS E VÍDEOS</a>
+            <a href="#" class="btn-link" target="_blank">MÚSICAS DA CAMPANHA</a>
+            <a href="https://www.instagram.com/marciodokizoeira/" class="btn-link" target="_blank">INSTAGRAM</a>
+            <a href="https://wa.me/559881318522" class="btn-link" target="_blank">WHATSAPP</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>#TIMEKIZOEIRA</p>
+    </footer>
+
+    <script>
+        window.addEventListener('load', () => {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const colors = ['#2EC254', '#86EFAC', '#10B981', '#FFFFFF', '#4ADE80', '#15803D'];
+            const confettiCount = 120;
+            const confetti = [];
+
+            // Criação dos confetes dispersos a partir do centro
+            for (let i = 0; i < confettiCount; i++) {
+                confetti.push({
+                    x: canvas.width / 2,
+                    y: canvas.height * 0.4,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vx: (Math.random() - 0.5) * 18,
+                    vy: (Math.random() - 0.7) * 16,
+                    gravity: 0.25,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 10
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let active = false;
+
+                confetti.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += p.gravity;
+                    p.vx *= 0.98;
+                    p.rotation += p.rotationSpeed;
+
+                    if (p.y < canvas.height) active = true;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.6);
+                    ctx.restore();
+                });
+
+                if (active) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animate();
+        });
+    </script>
+</body>
+</html>
